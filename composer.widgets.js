@@ -106,12 +106,15 @@
 //------ widgets -----
 $.fn.composerWidgets["text"] = {
 	"initialize": function() {
+		$(this.get("el")).addClass("cTextInput");
+
 		var html = '';
 		if( this.get("label") ) {
-			html += "<label for='" + this.get("id") + "'>" + this.get("label") + "</label>";
+			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
 		}
+		html += "<div class='cInput'>";
 		html += "<input type='text' id='" + this.get("id") + "'>";
-		html += "<span class='error'></span>";
+		html += "</div>";
 		$(this.get("el")).html(html);
 
 		//bind for value change
@@ -119,40 +122,70 @@ $.fn.composerWidgets["text"] = {
 		$(this.get("el")).find("input").bind("change", function() {
 			item.value( $(this).val() );
 		});
+
+		//placeholder handler
+		$.fn.composerWidgets["text"].set_placeholder.apply(this);
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").val( val );
 	},
+	"set_placeholder": function() {
+		if( !this.get("placeholder") ) { 
+			return false; 
+		}
+		this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
+		$(this.get("el")).find(".cPlaceholder").click(function() {
+			$(this).siblings("input").focus();
+		});
+		if( this.value() ) {
+			$(this.get("el")).find(".cPlaceholder").hide();
+		}
+		$(this.get("el")).find("input").bind("keyup", function() {
+			$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
+		});
+		return true;
+	},
 	"set_validation_message": function(msg) {
-		$(this.get("el")).find(".error").html(msg);
+		console.log(this.get("id"));
+		this.get("el").find(".cValidation").remove();
+		if( msg ) {
+			this.get("el").find(".cInput").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
+		}
 	}
 };
 
 $.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
+		$(this.get("el")).addClass("cTextInput");
+
 		var html = '';
 		if( this.get("label") ) {
-			html += "<label for='" + this.get("id") + "'>" + this.get("label") + "</label>";
+			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
 		}
+		html += "<div class='cInput'>";
 		html += "<input type='password' id='" + this.get("id") + "'>";
-		html += "<span class='error'></span>";
+		html += "</div>";
 		$(this.get("el")).html(html);
 
 		//bind for value change
-		var that = this;
+		var item = this;
 		$(this.get("el")).find("input").bind("change", function() {
-			that.value( $(this).val() );
+			item.value( $(this).val() );
 		});
+
+		//placeholder handler
+		$.fn.composerWidgets["text"].set_placeholder.apply(this);
 	}
 });
 
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		var html = '';
+		html += "<input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'>";
 		if( this.get("label") ) {
 			html += "<label for='" + this.get("id") + "'>" + this.get("label") + "</label>";
 		}
-		html += "<input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'>";
+
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 
@@ -169,15 +202,18 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 
 $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
-		var html = '';
+		var html = '<ul>';
 
 		var options = this.get("options");
 		var counter = 0;
 		for( var value in options ) {
 			var id = this.get("id") + "_" + counter; counter++;
+			html += "<li>";
 			html += "<input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'>";
 			html += "<label for='" + id + "'>" + options[value] + "</label>";
+			html += "</li>";
 		}
+		html += "</ul>";
 		
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);

@@ -4,7 +4,7 @@ var composerItem = Backbone.Model.extend({
 			throw("Missing `id` or `type` properties!");
 		}
 
-		var el = $("<div></div>");
+		var el = $("<div></div>").addClass("cRow").addClass("cType_" + this.get("type"));
 		$(this.collection.el).append(el);
 		this.set({"el": el});
 
