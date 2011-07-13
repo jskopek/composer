@@ -109,6 +109,12 @@ $.fn.composerWidgets["text"] = {
 		html += "<input type='text' id='" + this.get("id") + "'>";
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
+
+		//handle value change
+		var that = this;
+		$(this.get("el")).find("input").bind("change", function() {
+			that.value( $(this).val() );
+		});
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").val( val );
@@ -130,6 +136,12 @@ $.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<input type='password' id='" + this.get("id") + "'>";
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
+
+		//handle value change
+		var that = this;
+		$(this.get("el")).find("input").bind("change", function() {
+			that.value( $(this).val() );
+		});
 	}
 });
 
@@ -142,9 +154,18 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'>";
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
+
+		//handle value change
+		var that = this;
+		$(this.get("el")).find("input").bind("click", function() {
+			that.value( $(this).is(":checked") );
+		});
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").attr("checked", val ? true : false);
+	},
+	"get_value": function() {
+		return $(this.get("el")).find("input").is(":checked");
 	}
 });
 
@@ -162,6 +183,12 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 		
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
+	
+		//handle value change
+		var that = this;
+		$(this.get("el")).find("input").bind("click", function() {
+			that.value( $(this).attr("value") );
+		});
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("selected", true);
