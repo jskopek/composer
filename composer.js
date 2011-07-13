@@ -119,6 +119,16 @@ var composerCollection = Backbone.Collection.extend({
 					});
 					return is_valid;
 				},
+				"values": function() {
+					var values = {};
+					collection.each(function(item) {
+						values[ item.get("id") ] = item.value();
+					});
+					return values;
+				},
+				"items": function() {
+					return collection.models;
+				},
 				"bind": function( evt, fn ) {
 					collection.bind( evt, fn );
 				}

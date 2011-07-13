@@ -52,6 +52,8 @@ $(document).ready(function() {
 	$("#form1 a").click(function(e) {
 		e.preventDefault();
 		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
+
+		console.log( c.values() );
 	});
 	//`c.get("username").set({"value": "blablabla"});
 
