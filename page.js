@@ -34,6 +34,7 @@ $(document).ready(function() {
 
 	var c = $("#myform").composer();
 	c.add( dataset );
+	c.get("username").set({"value": "blablabla"});
 
 	var c2 = $("#myotherform").composer();
 	c2.add( data2 );

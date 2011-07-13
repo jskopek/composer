@@ -71,6 +71,9 @@ var composerCollection = Backbone.Collection.extend({
 			}
 
 			var methods = {
+				"get": function(id) {
+					return collection.get(id);
+				},
 				"add": function(data) {
 					collection.add(data);
 				},
