@@ -15,7 +15,7 @@ var composerItem = Backbone.Model.extend({
 	get_widget: function() {
 		var widget = this.collection.widgets[this.get("type")];
 		if( !widget ) {
-			alert("We don't know how to handle elements of type `" + this.get("type") + "`");
+			throw("We don't know how to handle elements of type `" + this.get("type") + "`");
 		}
 		return widget;
 	},
@@ -45,14 +45,45 @@ var composer = function(el, data) {
 	//interfaces for collection tasks
 	this.add = function(data) {
 		this.collection.add(data);
-	}
+	};
 
 	//interfaces for adding widgets and validation
 	this.addWidget = function(type, fn) {
 		this.collection.widgets[type] = fn;
-	}
+	};
 	this.addValidation = function(type, fn) {
 		this.collection.validation[type] = fn;
-	}
-}
+	};
+};
+
+(function($) {
+	$.fn.extend({
+		"composerWidgets": {},
+		"composerValidation": {},
+		"composer": function(data) {
+			var collection = new composerCollection();
+			collection.widgets = $.extend({}, $.fn.composerWidgets);
+			collection.validation = $.extend({}, $.fn.composerValidation);
+
+			collection.el = this;
+			if( data ) {
+				collection.add(data);
+			}
+
+			var methods = {
+				"add": function(data) {
+					collection.add(data);
+				},
+				"addWidget": function(type, fn) {
+					collection.widgets[type] = fn;
+				},
+				"addValidation": function(type, fn) {
+					collection.validation[type] = fn;
+				}
+			};
+			return methods;
+		}
+	});	
+})(jQuery);
+
 
