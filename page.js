@@ -2,16 +2,17 @@ $(document).ready(function() {
 	var data = {
 		"id": "username",
 		"type": "text",
-		"value": "jms",
+		//"value": "jms",
 		"label": "Username",
-		"validation": ["not_empty", "longer_than"],
-		"longer_than": 4
+		"validation": ["not_empty"],
+		"shorter_than": 4
 	};
 	var data2 = {
 		"id": "password",
 		"type": "password",
-		"value": "abcd",
-		"label": "Password"
+		"label": "Password",
+		"validation": ["longer_than"],
+		"longer_than": 4
 	};
 
 	var dataset	= [data, data2];
@@ -32,10 +33,17 @@ $(document).ready(function() {
 		"label": "Choose your account type"
 	});
 
-	var c = $("#myform").composer();
+	var c = $("#form1 .form_container").composer();
 	c.add( dataset );
-	c.get("username").set({"value": "blablabla"});
+	c.bind("change", function() {
+		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
+	});
+	$("#form1 a").click(function(e) {
+		e.preventDefault();
+		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
+	});
+	//`c.get("username").set({"value": "blablabla"});
 
-	var c2 = $("#myotherform").composer();
+	var c2 = $("#form2 .form_container").composer();
 	c2.add( data2 );
 });

@@ -20,7 +20,7 @@ var composerItem = Backbone.Model.extend({
 			var widget = this.get_widget();
 			widget.set_value.apply(this, [ this.get("value") ]);
 
-			this.validation();
+			this.is_valid();
 		});
 
 		//inform the collection of certain event changes
@@ -37,7 +37,7 @@ var composerItem = Backbone.Model.extend({
 		}
 		return widget;
 	},
-	validation: function() {
+	is_valid: function() {
 		//set up a list of validation types
 		var validation_types = [];
 		if( typeof this.get("validation") === "string" ) {
@@ -109,6 +109,18 @@ var composerCollection = Backbone.Collection.extend({
 				},
 				"addValidation": function(type, fn) {
 					collection.validation[type] = fn;
+				},
+				"is_valid": function() {
+					var is_valid = true;
+					collection.each(function(item) { 
+					   if( !item.is_valid() ) {
+						   is_valid = false;
+					   }
+					});
+					return is_valid;
+				},
+				"bind": function( evt, fn ) {
+					collection.bind( evt, fn );
 				}
 			};
 			return methods;
