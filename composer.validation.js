@@ -120,6 +120,11 @@ $.fn.composerValidation["number"] = function(item_val) {
 	}
 };
 $.fn.composerValidation["longer_than"] = function(item_val) {
+	var is_empty = $.fn.composerValidation["not_empty"].apply(this, [item_val]);
+	if( is_empty !== true ) { 
+		return is_empty; 
+	}
+
 	var c = parseInt( this.get("longer_than") , 10);
 	if( item_val.length <= c ) {
 		return 'Value must be more than ' + c + ' characters long';
@@ -128,6 +133,11 @@ $.fn.composerValidation["longer_than"] = function(item_val) {
 	}
 };
 $.fn.composerValidation["shorter_than"] = function(item_val) {
+	var is_empty = $.fn.composerValidation["not_empty"].apply(this, [item_val]);
+	if( is_empty !== true ) { 
+		return is_empty; 
+	}
+
 	var c = parseInt( this.get("shorter_than") , 10);
 	if( item_val.length >= c ) {
 		return 'Value must be less than ' + c + ' characters long';
