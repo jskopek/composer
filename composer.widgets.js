@@ -1,5 +1,5 @@
 //------ widgets -----
-var defaultWidget = {
+$.fn.composerWidgets["text"] = {
 	"initialize": function() {
 		var html = '';
 		if( this.get("label") ) {
@@ -21,9 +21,7 @@ var defaultWidget = {
 	}
 };
 
-$.fn.composerWidgets["text"] = defaultWidget;
-
-$.fn.composerWidgets["password"] = $.extend({}, defaultWidget, {
+$.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		var html = '';
 		if( this.get("label") ) {
@@ -36,7 +34,7 @@ $.fn.composerWidgets["password"] = $.extend({}, defaultWidget, {
 	}
 });
 
-$.fn.composerWidgets["checkbox"] = $.extend({}, defaultWidget, {
+$.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		var html = '';
 		if( this.get("label") ) {
@@ -52,7 +50,7 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, defaultWidget, {
 	}
 });
 
-$.fn.composerWidgets["radio"] = $.extend({}, defaultWidget, {
+$.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		var html = '';
 
