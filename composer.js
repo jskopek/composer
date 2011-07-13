@@ -38,7 +38,34 @@ var composerItem = Backbone.Model.extend({
 		return widget;
 	},
 	validation: function() {
-		console.log("validating", this.get("id"));
+		//set up a list of validation types
+		var validation_types = [];
+		if( typeof this.get("validation") === "string" ) {
+			validation_types = [ this.get("validation") ];
+		} else if( typeof this.get("validation") === "object" ) {
+			validation_types = this.get("validation");
+		} else {
+			return true;
+		}
+
+		for( var index in validation_types ) {
+			var validation = this.collection.validation[ validation_types[index] ];
+			if( !validation ) {
+				raise("Validation function `" + validation_types[index] + "` not defined!");
+			}
+
+			var result = validation.apply(this, [this.value()]);
+			if( result !== true ) {
+				if( typeof result === "string" ) {
+					this.get_widget().set_validation_message.apply(this, [result]);
+				}
+				return false;
+			} else {
+				this.get_widget().set_validation_message.apply(this, [false]);
+			}
+		}
+
+		return true;
 	},
 	value: function(val) {
 		if( val != undefined ) {
