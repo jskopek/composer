@@ -1,4 +1,55 @@
-//----- validation ------
+/*
+	COMPOSER VALIDATION:
+
+	This page covers how to add validation functions to Composer, as well as
+	initializing the built-in validation functions
+
+	Creating a new validation function:
+
+	Validation functions take one variable, which provides the value of the form item. The validation form
+	then determines if the value is valid, and returns a true boolean value if true, or a false or string value if the value is invalid.
+	If a false boolean is returned, the item will be simply marked as invalid. If a string is returned, the item will be marked as invalid,
+	and the string of text will be shown to inform the user why their input was invalid. 
+	
+	Validation functions are called by composerItem instances, and calling the `this` variable inside of a function will return the
+	`composerItem` instance that is being validated.
+
+	Validation functions are stored in the $.fn.composerValidation dictionary. To add a new function, simply add another value
+	to the dictionary. The key will be used to identify the validation type.
+
+	Example:
+		
+		$.fn.composerValidation["test_validation"] = function(item_val) {
+			return "This will always fail";
+		}
+
+		$("#form").composer({
+			"id": "test_item",
+			"type": "checkbox",
+			"label": "This is a test checkbox",
+			"validation": ["test_validation"]
+		});
+
+	When a form is created, the $.fn.composerValidation dictionary is cloned. Extending the composerValidation dictionary after a
+	form is initalized will not propagate the new validation function to exiting forms. Forms can be provided with validation functions
+	on-the-fly through the .addValidation method
+
+	Example:
+
+		var form = $("#form").composer();
+
+		form.addValidation("test_validation", function(item_val) {
+			return "This will always fail";
+		});
+		
+		form.add({
+			"id": "test_item",
+			"type": "checkbox",
+			"label": "This is a test checkbox",
+			"validation": ["test_validation"]
+		});
+*/
+
 $.fn.composerValidation["num_greater_than"] = function(item_val) {
 	var c = parseInt( this.get("num_greater_than") , 10);
 	if( isNaN(parseFloat(item_val)) || (parseFloat(item_val) <= c) ) {
