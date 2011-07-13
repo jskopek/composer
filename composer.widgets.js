@@ -13,13 +13,12 @@
 	{
 		//renders the form element in the dom and binds any necessary events
 		//do not set the value of the element here - it will be done automatically (by calling 'set_value' after initialization)
+
+		//the intialize command should update the composerItem's value when the form element is changed (see example)
 		"initialize": function() {},
 
 		//updates the form element with the item's value (accessible via this.get("value"))
 		"set_value": function( val ) {},
-
-		//returns the form element's value
-		"get_value": function() {},
 
 		//takes a validation message and renders it on the screen; may take a string value or a false boolean, which should
 		//cause the validation message to be hidden
@@ -33,6 +32,8 @@
 		- this.get("id");
 		- this.get("el"); //the DOM element assigned to the widget
 		- this.get("label");
+		- this.value(); //get the value set in the composerItem instance
+		- this.value( val ); //set the composerItem instance's value (will call widget's 'set_value' function)
 
 	Validation functions are stored in the $.fn.composerWidgets dictionary. To add a new function, simply add another value
 	to the dictionary. The key will be used to identify the validation type.
@@ -44,12 +45,15 @@
 				var html = '<input type='text' id='" + this.get('id') + "'>';
 				$(this.get("el")).html(html);
 				this.value( this.value() );
+
+				//bind for value change
+				var item = this;
+				$(this.get("el")).find("input").bind("change", function(tst) {
+					item.value( $(this).val() );
+				});
 			},
 			"set_value": function( val ) {
 				$(this.get("el")).find("input").val( val );
-			},
-			"get_value": function() {
-				return $(this.get("el")).find("input").val();
 			},
 			"set_validation_message": function(msg) {
 				$(this.get("el")).find(".error").html(msg);
@@ -110,17 +114,14 @@ $.fn.composerWidgets["text"] = {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 
-		//handle value change
-		var that = this;
+		//bind for value change
+		var item = this;
 		$(this.get("el")).find("input").bind("change", function() {
-			that.value( $(this).val() );
+			item.value( $(this).val() );
 		});
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").val( val );
-	},
-	"get_value": function() {
-		return $(this.get("el")).find("input").val();
 	},
 	"set_validation_message": function(msg) {
 		$(this.get("el")).find(".error").html(msg);
@@ -137,7 +138,7 @@ $.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 
-		//handle value change
+		//bind for value change
 		var that = this;
 		$(this.get("el")).find("input").bind("change", function() {
 			that.value( $(this).val() );
@@ -155,7 +156,7 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 
-		//handle value change
+		//bind for value change
 		var that = this;
 		$(this.get("el")).find("input").bind("click", function() {
 			that.value( $(this).is(":checked") );
@@ -163,9 +164,6 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").attr("checked", val ? true : false);
-	},
-	"get_value": function() {
-		return $(this.get("el")).find("input").is(":checked");
 	}
 });
 
@@ -184,7 +182,7 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 	
-		//handle value change
+		//bind for value change
 		var that = this;
 		$(this.get("el")).find("input").bind("click", function() {
 			that.value( $(this).attr("value") );
@@ -192,9 +190,6 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("selected", true);
-	},
-	"get_value": function() {
-		return $(this.get("el")).find("input[selected]").attr("value");
 	}
 });
 
