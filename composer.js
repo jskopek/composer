@@ -14,6 +14,21 @@ var composerItem = Backbone.Model.extend({
 		if( this.get("value") ) {
 			this.value( this.get("value") );
 		}
+
+		//trigger validation on item value change
+		this.bind("change:value", function() {
+			var widget = this.get_widget();
+			widget.set_value.apply(this, [ this.get("value") ]);
+
+			this.validation();
+		});
+
+		//inform the collection of certain event changes
+		this.bind("change:value", function() {
+			this.collection.trigger("change", this);
+		});
+
+		if( this.get("value") ) { this.trigger("change:value"); }
 	},
 	get_widget: function() {
 		var widget = this.collection.widgets[this.get("type")];
@@ -22,16 +37,15 @@ var composerItem = Backbone.Model.extend({
 		}
 		return widget;
 	},
-	validate: function() {
+	validation: function() {
+		console.log("validating", this.get("id"));
 	},
 	value: function(val) {
-		var widget = this.get_widget();
-
-		if( this.get("value") ) {
-			widget.set_value.apply(this, [this.get("value")]);
+		if( val != undefined ) {
+			this.set({"value": val});
 		}
 
-		return widget.get_value.apply(this);
+		return this.get("value");
 	}
 
 });
