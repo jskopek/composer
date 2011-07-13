@@ -32,6 +32,17 @@ $(document).ready(function() {
 		},
 		"label": "Choose your account type"
 	});
+    dataset.push({
+        "id": "organization",
+        "type": "select",
+        "options": {
+            "waterloo": "University of Waterloo",
+            "uoit": "University of Ontario Institute of Technology",
+            "laurier": "Wilfred Laurier University",
+            "guelph": "University of Guelph"
+        },
+        "label": "Choose your university"
+    });
 
 	var c = $("#form1 .form_container").composer();
 	c.add( dataset );
