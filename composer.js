@@ -10,6 +10,10 @@ var composerItem = Backbone.Model.extend({
 
 		var widget = this.get_widget();
 		widget.initialize.apply(this);
+
+		if( this.get("value") ) {
+			this.value( this.get("value") );
+		}
 	},
 	get_widget: function() {
 		var widget = this.collection.widgets[this.get("type")];
@@ -21,6 +25,13 @@ var composerItem = Backbone.Model.extend({
 	validate: function() {
 	},
 	value: function(val) {
+		var widget = this.get_widget();
+
+		if( this.get("value") ) {
+			widget.set_value.apply(this, [this.get("value")]);
+		}
+
+		return widget.get_value.apply(this);
 	}
 
 });

@@ -16,7 +16,7 @@
 		"initialize": function() {},
 
 		//updates the form element with the item's value (accessible via this.get("value"))
-		"set_value": function() {},
+		"set_value": function( val ) {},
 
 		//returns the form element's value
 		"get_value": function() {},
@@ -45,8 +45,8 @@
 				$(this.get("el")).html(html);
 				this.value( this.value() );
 			},
-			"set_value": function() {
-				$(this.get("el")).find("input").val( this.value() );
+			"set_value": function( val ) {
+				$(this.get("el")).find("input").val( val );
 			},
 			"get_value": function() {
 				return $(this.get("el")).find("input").val();
@@ -110,8 +110,8 @@ $.fn.composerWidgets["text"] = {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 	},
-	"set_value": function() {
-		$(this.get("el")).find("input").val( this.value() );
+	"set_value": function( val ) {
+		$(this.get("el")).find("input").val( val );
 	},
 	"get_value": function() {
 		return $(this.get("el")).find("input").val();
@@ -143,8 +143,8 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 	},
-	"set_value": function() {
-		$(this.get("el")).find("input").attr("checked", this.value() ? true : false);
+	"set_value": function( val ) {
+		$(this.get("el")).find("input").attr("checked", val ? true : false);
 	}
 });
 
@@ -163,8 +163,8 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 	},
-	"set_value": function() {
-		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == this.value() ? true : false; }).attr("selected", true);
+	"set_value": function( val ) {
+		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("selected", true);
 	},
 	"get_value": function() {
 		return $(this.get("el")).find("input[selected]").attr("value");
