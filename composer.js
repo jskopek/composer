@@ -4,7 +4,12 @@ var composerItem = Backbone.Model.extend({
 			alert("Missing `id` or `type` properties!");
 		}
 
-		this.get_widget();
+		var el = $("<div></div>");
+		$(this.collection.el).append(el);
+		this.set({"el": el});
+
+		var widget = this.get_widget();
+		widget.initialize.apply(this);
 		//this.collection.el.append(el);
 	},
 	get_widget: function() {
@@ -12,6 +17,7 @@ var composerItem = Backbone.Model.extend({
 		if( !widget ) {
 			alert("We don't know how to handle elements of type `" + this.get("type") + "`");
 		}
+		return widget;
 	},
 	validate: function() {
 	},
@@ -36,9 +42,12 @@ var composer = function(el, data) {
 		this.collection.add(data);
 	}
 
+	//interfaces for collection tasks
 	this.add = function(data) {
 		this.collection.add(data);
 	}
+
+	//interfaces for adding widgets and validation
 	this.addWidget = function(type, fn) {
 		this.collection.widgets[type] = fn;
 	}
