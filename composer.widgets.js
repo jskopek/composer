@@ -194,8 +194,32 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 });
 
 $.fn.composerWidgets["textarea"] = {};
-$.fn.composerWidgets["select"] = {};
+$.fn.composerWidgets["select"] = {
+    "initialize": function() {
+        var html = "<select id='" + this.get("id") + "'>";
+        var options = this.get("options");
+        
+        var counter = 0;
+        for (var value in options) {
+            var id = this.get("id") + "_" + counter; counter++;
+            html += "<option value='" + value + "'>" + options[value] + "</option>";
+        }
+
+        html += "<span class='error'></span>";
+        $(this.get("el")).html(html);
+
+        // Bind on value change
+        var that = this;
+        $(this.get("el")).find("select").bind("change", function() {
+            that.value($(this).val());
+        });
+    },
+    "set_value": function(value) {
+        $(this.get("el")).find("select").filter(function() {
+            return $(this).val() == value ? true: false;
+        });
+    }
+};
 $.fn.composerWidgets["picker"] = {};
 $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["uploadify"] = {};
-
