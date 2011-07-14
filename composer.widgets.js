@@ -125,9 +125,15 @@ $.fn.composerWidgets["text"] = {
 
 		//placeholder handler
 		$.fn.composerWidgets["text"].set_placeholder.apply(this);
+		$.fn.composerWidgets["text"].set_tooltip.apply(this);
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").val( val );
+	},
+	"set_tooltip": function() {
+		if( this.get("tooltip") ) {
+			this.get("el").find(".cLabel").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
+		}
 	},
 	"set_placeholder": function() {
 		if( !this.get("placeholder") ) { 
@@ -175,6 +181,7 @@ $.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
 
 		//placeholder handler
 		$.fn.composerWidgets["text"].set_placeholder.apply(this);
+		$.fn.composerWidgets["text"].set_tooltip.apply(this);
 	}
 });
 

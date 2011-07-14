@@ -5,7 +5,9 @@ $(document).ready(function() {
 		//"value": "jms",
 		"label": "Username",
 		"validation": ["not_empty"],
-		"shorter_than": 4
+		"shorter_than": 4,
+		"placeholder": "jms",
+		"tooltip": "This is a long tooltip that will help the user understand what the purpose of the username field is"
 	};
 	var data2 = {
 		"id": "password",
