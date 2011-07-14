@@ -160,13 +160,11 @@
 /* tooltip */
 .cRow .cTooltip {
 	display: inline-block;
-	width: 18px;
-	height: 18px;	
-	position: absolute;
+	width: 16px;
+	height: 16px;	
 	cursor: pointer;
 	background: no-repeat url(http://cdn4.iconfinder.com/data/icons/Icon_for_MealKeeper__s_soft_by_shlyapnikova/help_16.png);
 	margin-left: 7px;
-	margin-top: 1px;
 }
 
 .cRow .cTooltip span {
