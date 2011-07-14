@@ -60,6 +60,23 @@ $(document).ready(function() {
         },
         "label": "Choose your university"
     });
+    dataset.push({
+        "id": "multiple_choice",
+        "type": "set",
+        "structure": "<input type='text'></input>",
+        "add": function(el) {
+            var that = this;
+            el.find("input").bind("change", function() {
+                that.value($(this).val());
+            });
+        },
+        "remove": function() { /* TODO */ },
+        "sortable": false,
+        "set_value": function(structure, value) {
+            structure.val(value);
+        },
+        "label": "Multiple choices"
+    });
 
 	c = $("#form1 .form_container").composer();
 	c.add( dataset );
