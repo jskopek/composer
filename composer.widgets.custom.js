@@ -1,19 +1,18 @@
-$.fn.composerWidgets["set"] = {
-    "initialize": function() {
-        debugger;
+$.fn.composerWidgets["set"] = $.extend(
+    {},
+    $.fn.composerWidgets["generic_widget_generator"](function() {
         var html = "";
-        var options = this.get("options");
-
-        var counter = 0;
-        for (var value in options) {
-            var id = this.get("id") + "_" + counter; counter++;
-
-        }
+        html += this.get("structure");
+        
+        // TODO: add "Add" button
+        html += "<input type='submit'>Add</input>";
 
         html += "<span class='error'></span>";
-        $(this.get("el")).html(html);
-    },
-    "set_value": function(value) {
-        this.get("set_value")(this.get("el"), value);
+        return html;
+    }),
+    {
+        "set_value": function(value) {
+            this.get("set_value")(this.get("el"), value);
+        }
     }
-};
+);
