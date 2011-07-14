@@ -31,7 +31,10 @@ $(document).ready(function() {
 		"id": "tos",
 		"type": "checkbox",
 		"value": true,
-		"label": "I agree to the terms of service"
+		"label": "I agree to the terms of service",
+		"validation": ["not_empty", "longer_than"],
+		"longer_than" : 4,
+		"tooltip": "This is a test"
 	});
 	dataset.push({
 		"id": "type",
@@ -40,7 +43,10 @@ $(document).ready(function() {
 			"light": "Light - free",
 			"premium": "Premium - $40 / year"
 		},
-		"label": "Choose your account type"
+		"label": "Choose your account type",
+		"validation": ["not_empty", "longer_than"],
+		"longer_than" : 400,
+		"tooltip": "This is a test"
 	});
     dataset.push({
         "id": "organization",
