@@ -69,7 +69,9 @@ $(document).ready(function() {
         "id": "multiple_choice_good",
         "type": "set",
         "structure": function(row) {
-			var html = "<input type='text' value='" + row.value + "' style='width:80%'/>";
+			var html = "";
+			html += row.generateSortButton();
+			html += "<input type='text' value='" + row.value + "' style='width:80%'/>";
 			html += row.generateDeleteButton();
 
 			$(row.el).html(html);
@@ -78,7 +80,7 @@ $(document).ready(function() {
 				row.setValue( $(this).val() );
 			});
 		},
-        "sortable": false,
+        "sortable": true,
         "label": "Multiple choices badass"
     });
 

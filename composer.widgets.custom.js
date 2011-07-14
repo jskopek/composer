@@ -19,6 +19,30 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "</div>";
 		$(this.get("el")).html(html);
 
+		var that = this;
+		if( this.get("sortable") && $.fn.sortable ) {
+			$(this.get("el")).find("ul").sortable({
+				"axis": "y",
+				"handle": ".cSortHandle",
+				"containment": "parent",
+				"start": function(evt, ui) {
+					//http://css.dzone.com/articles/keeping-track-indexes-while
+					ui.item.data("originIndex", ui.item.index());
+				},
+				"stop": function(evt, ui) {
+					var value = that.value();
+					var originIndex = ui.item.data("originIndex");
+					var currentIndex = ui.item.index();
+	
+					var swapA = value[originIndex];
+					var swapB = value[currentIndex];
+	
+					value[originIndex] = swapB;
+					value[currentIndex] = swapA;
+				}
+			});
+		}
+
 		//bind for value change
 		var item = this;
 		$(this.get("el")).find("a.add").bind("click", function(e) {
@@ -36,7 +60,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		$("a.delete").live("click", function(e) {
 			e.preventDefault();
 
-			var index = $(this).attr("value");
+			var index = $(this).parents("li").index();
 
 			var index_el = item.get("el").find("li:eq(" + index + ")");
 			if( item.get("delete") ) {
@@ -58,6 +82,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		var val = this.value();
 		var ul = this.get("el").find("ul").html("");
 
+		var item = this;
 		for( var index in val ) {
 			var el = $("<li></li>");
 			ul.append(el);
@@ -72,8 +97,15 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 						item.value()[ el.index() ] = val;
 					};
 				}.apply(el, [this]),
+				"generateSortButton": function() {
+					if( item.get("sortable") && $.fn.sortable ) {
+						return "<span class='cSortHandle'>|||</span>";
+					} else {
+						return "";
+					}
+				},
 				"generateDeleteButton": function() {
-					return "<a href='#' class='cButton delete' value=" + index + ">Delete</a>";
+					return "<a href='#' class='cButton delete'>Delete</a>";
 				}
 			};
 			this.get("structure").apply(this, [method]);

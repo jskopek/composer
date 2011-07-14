@@ -102,6 +102,7 @@
 	font-weight: bold;
 	text-decoration: none;
 	color: #0b3852;
+	background: #f6f6f6;
 	
 	margin: 5px 0;
 	border-radius: 4px;	
@@ -118,6 +119,16 @@
 	background: #edf6fa;
 	-webkit-box-shadow: 0px 0px 2px #000;
 	-moz-box-shadow: 0px 0px 2px #000;
+}
+
+.cRow .cSortHandle {
+	color: #aaa;
+	margin-right: 7px;
+	text-shadow: 1px 1px 1px #e4f4fa;
+	cursor: move;
+}
+.cRow .cSortHandle:hover {
+	color: #0b3852;
 }
 .cRow .cInput textarea {
 	height: 80px;
