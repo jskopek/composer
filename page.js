@@ -81,6 +81,19 @@ $(document).ready(function() {
         "sortable": false,
         "label": "Multiple choices badass"
     });
+    dataset.push({
+        "id": "picker",
+        "type": "picker",
+        "options": ["1", "2", "3", "4"],
+        "label": "Pick your number"
+    });
+    dataset.push({
+        "id": "picker",
+        "type": "picker",
+        "options": ["whales", "turtles", "lions", "people"],
+        "value": "turtles",
+        "label": "Pick your string"
+    });
 
 	c = $("#form1 .form_container").composer();
 	c.add( dataset );
