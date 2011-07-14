@@ -60,6 +60,11 @@ $(document).ready(function() {
         },
         "label": "Choose your university"
     });
+	dataset.push({
+		"id": "html_test",
+		"type": "html",
+		"value": "<h1>This is some custom html</h1>"
+	});
     dataset.push({
         "id": "multiple_choice_good",
         "type": "set",

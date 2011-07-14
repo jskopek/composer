@@ -161,7 +161,6 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 	};
 };
 
-
 //GENERIC WIDGETS
 $.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function() { 
 	return "<input type='text' id='" + this.get("id") + "'>"; 
@@ -202,6 +201,14 @@ $.fn.composerWidgets["uploadify"] = {};
 $.fn.composerWidgets["button"] = {};
 
 //FANCY WIDGETS
+$.fn.composerWidgets["html"] = 	{
+	"initialize": function() {
+		this.get("el").html( this.value() );
+	},
+	"set_value": function( val ) {},
+	"set_validation_message": function(msg) {}
+};
+
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		$(this.get("el")).addClass("cClickInput");
