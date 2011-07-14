@@ -104,87 +104,104 @@
 */
 
 //------ widgets -----
-$.fn.composerWidgets["text"] = {
-	"initialize": function() {
-		$(this.get("el")).addClass("cTextInput");
+$.fn.composerWidgets["generic_widget_generator"] = function(input_html_generator_fn) {
+	return {
+		"initialize": function() {
+			$(this.get("el")).addClass("cTextInput");
 
-		var html = '';
-		if( this.get("label") ) {
-			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-		}
-		html += "<div class='cInput'>";
-		html += "<input type='text' id='" + this.get("id") + "'>";
-		html += "</div>";
-		$(this.get("el")).html(html);
+			var html = '';
+			if( this.get("label") ) {
+				html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
+			}
+			html += "<div class='cInput'>";
+			html += input_html_generator_fn.apply(this);
+			html += "</div>";
+			$(this.get("el")).html(html);
 
-		//bind for value change
-		var item = this;
-		$(this.get("el")).find("input").bind("change", function() {
-			item.value( $(this).val() );
-		});
+			//bind for value change
+			var item = this;
+			$(this.get("el")).find("input").bind("change", function() {
+				item.value( $(this).val() );
+			});
 
-		//placeholder handler
-		$.fn.composerWidgets["text"].set_placeholder.apply(this);
-		$.fn.composerWidgets["text"].set_tooltip.apply(this);
-	},
-	"set_value": function( val ) {
-		$(this.get("el")).find("input").val( val );
-	},
-	"set_tooltip": function() {
-		if( this.get("tooltip") ) {
-			this.get("el").find(".cLabel").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
+			//placeholder handler
+			$.fn.composerWidgets["text"].set_placeholder.apply(this);
+			$.fn.composerWidgets["text"].set_tooltip.apply(this);
+		},
+		"set_value": function( val ) {
+			$(this.get("el")).find("input").val( val );
+		},
+		"set_tooltip": function() {
+			if( this.get("tooltip") ) {
+				this.get("el").find(".cLabel").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
+			}
+		},
+		"set_placeholder": function() {
+			if( !this.get("placeholder") ) { 
+				return false; 
+			}
+			this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
+			$(this.get("el")).find(".cPlaceholder").click(function() {
+				$(this).siblings("input").focus();
+			});
+			if( this.value() ) {
+				$(this.get("el")).find(".cPlaceholder").hide();
+			}
+			$(this.get("el")).find("input").bind("keyup", function() {
+				$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
+			});
+			return true;
+		},
+		"set_validation_message": function(msg) {
+			console.log(this.get("id"));
+			this.get("el").find(".cValidation").remove();
+			if( msg ) {
+				this.get("el").find(".cInput").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
+			}
 		}
-	},
-	"set_placeholder": function() {
-		if( !this.get("placeholder") ) { 
-			return false; 
-		}
-		this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
-		$(this.get("el")).find(".cPlaceholder").click(function() {
-			$(this).siblings("input").focus();
-		});
-		if( this.value() ) {
-			$(this.get("el")).find(".cPlaceholder").hide();
-		}
-		$(this.get("el")).find("input").bind("keyup", function() {
-			$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
-		});
-		return true;
-	},
-	"set_validation_message": function(msg) {
-		console.log(this.get("id"));
-		this.get("el").find(".cValidation").remove();
-		if( msg ) {
-			this.get("el").find(".cInput").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
-		}
-	}
+	};
 };
 
-$.fn.composerWidgets["password"] = $.extend({}, $.fn.composerWidgets["text"], {
-	"initialize": function() {
-		$(this.get("el")).addClass("cTextInput");
 
-		var html = '';
-		if( this.get("label") ) {
-			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-		}
-		html += "<div class='cInput'>";
-		html += "<input type='password' id='" + this.get("id") + "'>";
-		html += "</div>";
-		$(this.get("el")).html(html);
-
-		//bind for value change
-		var item = this;
-		$(this.get("el")).find("input").bind("change", function() {
-			item.value( $(this).val() );
-		});
-
-		//placeholder handler
-		$.fn.composerWidgets["text"].set_placeholder.apply(this);
-		$.fn.composerWidgets["text"].set_tooltip.apply(this);
-	}
+//generic widgets
+$.fn.composerWidgets["text"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+	return "<input type='text' id='" + this.get("id") + "'>"; 
 });
 
+$.fn.composerWidgets["password"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+	return "<input type='password' id='" + this.get("id") + "'>"; 
+});
+
+$.fn.composerWidgets["textarea"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+	return "<textarea id='" + this.get("id") + "'></textarea>"; 
+});
+
+$.fn.composerWidgets["select"] = $.extend(
+	{}, 
+	$.fn.composerWidgets["generic_widget_generator"](function() {
+        var html = "<select id='" + this.get("id") + "'>";
+        var options = this.get("options");
+        
+        var counter = 0;
+        for (var value in options) {
+            var id = this.get("id") + "_" + counter; counter++;
+            html += "<option value='" + value + "'>" + options[value] + "</option>";
+        }
+		return html;
+	}), 
+	{
+		"set_value": function(value) {
+			$(this.get("el")).find("select").filter(function() {
+				return $(this).val() == value ? true: false;
+			});
+		}
+	}
+);
+$.fn.composerWidgets["picker"] = {};
+$.fn.composerWidgets["number"] = {};
+$.fn.composerWidgets["uploadify"] = {};
+
+//weirder wigdgets
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		var html = '';
@@ -236,33 +253,4 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 	}
 });
 
-$.fn.composerWidgets["textarea"] = {};
-$.fn.composerWidgets["select"] = {
-    "initialize": function() {
-        var html = "<select id='" + this.get("id") + "'>";
-        var options = this.get("options");
-        
-        var counter = 0;
-        for (var value in options) {
-            var id = this.get("id") + "_" + counter; counter++;
-            html += "<option value='" + value + "'>" + options[value] + "</option>";
-        }
 
-        html += "<span class='error'></span>";
-        $(this.get("el")).html(html);
-
-        // Bind on value change
-        var that = this;
-        $(this.get("el")).find("select").bind("change", function() {
-            that.value($(this).val());
-        });
-    },
-    "set_value": function(value) {
-        $(this.get("el")).find("select").filter(function() {
-            return $(this).val() == value ? true: false;
-        });
-    }
-};
-$.fn.composerWidgets["picker"] = {};
-$.fn.composerWidgets["number"] = {};
-$.fn.composerWidgets["uploadify"] = {};

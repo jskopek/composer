@@ -18,7 +18,15 @@ $(document).ready(function() {
 	};
 
 	var dataset	= [data, data2];
-	
+
+	dataset.push({
+		"id": "feedback",
+		"type": "textarea",
+		"tooltip": "Testing tooltip",
+		"placeholder": "Testing placeholder",
+		"label": "Feedback"
+	});
+
 	dataset.push({
 		"id": "tos",
 		"type": "checkbox",
