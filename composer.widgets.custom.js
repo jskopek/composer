@@ -5,7 +5,7 @@ $.fn.composerWidgets["set"] = $.extend(
         html += this.get("structure");
         
         // TODO: add "Add" button
-        html += "<input type='submit'>Add</input>";
+        html += "<input type='submit' value='Add'>";
 
         html += "<span class='error'></span>";
         return html;
