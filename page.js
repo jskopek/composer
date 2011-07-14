@@ -1,3 +1,4 @@
+var c;
 $(document).ready(function() {
 	var data = {
 		"id": "username",
@@ -60,7 +61,7 @@ $(document).ready(function() {
         "label": "Choose your university"
     });
 
-	var c = $("#form1 .form_container").composer();
+	c = $("#form1 .form_container").composer();
 	c.add( dataset );
 	c.bind("change", function() {
 		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
@@ -75,4 +76,16 @@ $(document).ready(function() {
 
 	var c2 = $("#form2 .form_container").composer();
 	c2.add( data2 );
+
+	//events
+	c.bind("change", function() { console.log("form.change"); });
+	c.bind("add", function() { console.log("form.add"); });
+	c.bind("remove", function() { console.log("form.remove"); });
+	c.bind("valid", function() { console.log("form.valid"); });
+	c.bind("invalid", function() { console.log("form.invalid"); });
+
+	c.get("username").bind("change", function() { console.log("username.change"); });
+	c.get("username").bind("click", function() { console.log("username.click"); });
+	c.get("username").bind("valid", function() { console.log("username.valid"); });
+	c.get("username").bind("invalid", function() { console.log("username.invalid"); });
 });

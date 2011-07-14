@@ -8,6 +8,10 @@ var composerItem = Backbone.Model.extend({
 		$(this.collection.el).append(el);
 		this.set({"el": el});
 
+		$(el).bind("click", function() {
+			this.trigger("click");
+		}.bind(this));
+
 		var widget = this.get_widget();
 		widget.initialize.apply(this);
 
@@ -20,12 +24,23 @@ var composerItem = Backbone.Model.extend({
 			var widget = this.get_widget();
 			widget.set_value.apply(this, [ this.get("value") ]);
 
-			this.is_valid();
+			var is_valid = this.is_valid();
+			this.trigger( is_valid ? "valid" : "invalid" );
+		});
+
+		this.bind("remove", function() {
+			this.get("el").remove();
 		});
 
 		//inform the collection of certain event changes
 		this.bind("change:value", function() {
 			this.collection.trigger("change", this);
+		});
+		this.bind("change:valid", function() {
+			this.collection.trigger("valid", this);
+		});
+		this.bind("change:invalid", function() {
+			this.collection.trigger("invalid", this);
 		});
 
 		if( this.get("value") ) { this.trigger("change:value"); }
@@ -104,6 +119,10 @@ var composerCollection = Backbone.Collection.extend({
 				"add": function(data) {
 					collection.add(data);
 				},
+				"remove": function(id) {
+					collection.remove(id);
+				},
+
 				"addWidget": function(type, fn) {
 					collection.widgets[type] = fn;
 				},
