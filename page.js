@@ -61,21 +61,20 @@ $(document).ready(function() {
         "label": "Choose your university"
     });
     dataset.push({
-        "id": "multiple_choice",
+        "id": "multiple_choice_good",
         "type": "set",
-        "structure": "<input type='text' value='{{value}}'/>",
-        "add": function(el) {
-            var that = this;
-            el.find("input").bind("change", function() {
-                that.value($(this).val());
-            });
-        },
-        "remove": function() { /* TODO */ },
+        "structure": function(row) {
+			var html = "<input type='text' value='" + row.value + "' style='width:80%'/>";
+			html += row.generateDeleteButton();
+
+			$(row.el).html(html);
+			
+			$(row.el).find("input").bind("change", function() {
+				row.setValue( $(this).val() );
+			});
+		},
         "sortable": false,
-        "set_value": function(structure, value) {
-            structure.val(value);
-        },
-        "label": "Multiple choices"
+        "label": "Multiple choices badass"
     });
 
 	c = $("#form1 .form_container").composer();
