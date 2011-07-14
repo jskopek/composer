@@ -55,6 +55,13 @@
 	border: 1px solid #dfdfdf;	
 	position: relative;
 }
+.cRow ul {
+	margin: 0;
+	padding: 0;
+}
+.cRow ul li {
+	list-style: none;
+}
 .cRow .cLabel,
 .cRow .cInput {
 	display: inline-block;
@@ -90,6 +97,27 @@
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
+.cRow .cButton {
+	font-weight: bold;
+	text-decoration: none;
+	color: #0b3852;
+	
+	margin: 5px 0;
+	border-radius: 4px;	
+	display: inline-block;
+	border: 3px solid #e4f4fa;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+
+	font-size: 1em;
+	font-family: Helvetica;
+	padding: 8px 24px;
+}
+.cRow .cButton:hover {
+	background: #edf6fa;
+	-webkit-box-shadow: 0px 0px 2px #000;
+	-moz-box-shadow: 0px 0px 2px #000;
+}
 .cRow .cInput textarea {
 	height: 80px;
 }
@@ -103,9 +131,6 @@
 .cRow.cType_radio ul {
 	margin: 0;
 	padding: 0;
-}
-.cRow.cType_radio ul li {
-	list-style: none;
 }
 .cRow.cType_radio ul li label {
 	padding: 4px 0;

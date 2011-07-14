@@ -63,7 +63,7 @@ $(document).ready(function() {
     dataset.push({
         "id": "multiple_choice",
         "type": "set",
-        "structure": "<input type='text'></input>",
+        "structure": "<input type='text' value='{{value}}'/>",
         "add": function(el) {
             var that = this;
             el.find("input").bind("change", function() {

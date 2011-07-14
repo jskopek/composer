@@ -8,9 +8,10 @@ var composerItem = Backbone.Model.extend({
 		$(this.collection.el).append(el);
 		this.set({"el": el});
 
+		var that = this;
 		$(el).bind("click", function() {
-			this.trigger("click");
-		}.bind(this));
+			that.trigger("click");
+		});
 
 		var widget = this.get_widget();
 		widget.initialize.apply(this);
