@@ -133,7 +133,7 @@ $.fn.composerWidgets["generic_widget_generator"] = function(input_html_generator
 		},
 		"set_tooltip": function() {
 			if( this.get("tooltip") ) {
-				this.get("el").find(".cLabel").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
+				this.get("el").find(".cLabel:first").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
 			}
 		},
 		"set_placeholder": function() {
@@ -142,21 +142,20 @@ $.fn.composerWidgets["generic_widget_generator"] = function(input_html_generator
 			}
 			this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
 			$(this.get("el")).find(".cPlaceholder").click(function() {
-				$(this).siblings("input").focus();
+				$(this).siblings("input").add( $(this).siblings("textarea") ).focus();
 			});
 			if( this.value() ) {
 				$(this.get("el")).find(".cPlaceholder").hide();
 			}
-			$(this.get("el")).find("input").bind("keyup", function() {
+			$(this.get("el")).find("input").add( $(this.get("el")).find("textarea") ).bind("keyup", function() {
 				$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
 			});
 			return true;
 		},
 		"set_validation_message": function(msg) {
-			console.log(this.get("id"));
 			this.get("el").find(".cValidation").remove();
 			if( msg ) {
-				this.get("el").find(".cInput").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
+				this.get("el").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
 			}
 		}
 	};
@@ -200,17 +199,18 @@ $.fn.composerWidgets["select"] = $.extend(
 $.fn.composerWidgets["picker"] = {};
 $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["uploadify"] = {};
+$.fn.composerWidgets["button"] = {};
 
 //weirder wigdgets
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
-		var html = '';
-		html += "<input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'>";
-		if( this.get("label") ) {
-			html += "<label for='" + this.get("id") + "'>" + this.get("label") + "</label>";
-		}
+		$(this.get("el")).addClass("cClickInput");
 
-		html += "<span class='error'></span>";
+		var html = '';
+		html += "<div class='cInput'><input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'></div>";
+		if( this.get("label") ) {
+			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
+		}
 		$(this.get("el")).html(html);
 
 		//bind for value change
@@ -218,6 +218,11 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		$(this.get("el")).find("input").bind("click", function() {
 			that.value( $(this).is(":checked") );
 		});
+
+		//placeholder handler
+		$.fn.composerWidgets["text"].set_placeholder.apply(this);
+		$.fn.composerWidgets["text"].set_tooltip.apply(this);
+
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").attr("checked", val ? true : false);
@@ -226,6 +231,8 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 
 $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
+		$(this.get("el")).addClass("cClickInput");
+
 		var html = '<ul>';
 
 		var options = this.get("options");
@@ -233,13 +240,12 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 		for( var value in options ) {
 			var id = this.get("id") + "_" + counter; counter++;
 			html += "<li>";
-			html += "<input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'>";
-			html += "<label for='" + id + "'>" + options[value] + "</label>";
+			html += "<div class='cInput'><input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'></div>";
+			html += "<div class='cLabel'><label for='" + id + "'>" + options[value] + "</label></div>";
 			html += "</li>";
 		}
 		html += "</ul>";
 		
-		html += "<span class='error'></span>";
 		$(this.get("el")).html(html);
 	
 		//bind for value change
@@ -247,6 +253,11 @@ $.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
 		$(this.get("el")).find("input").bind("click", function() {
 			that.value( $(this).attr("value") );
 		});
+
+		//placeholder handler
+		$.fn.composerWidgets["text"].set_placeholder.apply(this);
+		$.fn.composerWidgets["text"].set_tooltip.apply(this);
+
 	},
 	"set_value": function( val ) {
 		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("selected", true);
