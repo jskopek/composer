@@ -51,7 +51,7 @@ var composerItem = Backbone.Model.extend({
 		for( var index in validation_types ) {
 			var validation = this.collection.validation[ validation_types[index] ];
 			if( !validation ) {
-				raise("Validation function `" + validation_types[index] + "` not defined!");
+				throw("Validation function `" + validation_types[index] + "` not defined!");
 			}
 
 			var result = validation.apply(this, [this.value()]);
