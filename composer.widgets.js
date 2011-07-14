@@ -103,8 +103,8 @@
 		});
 */
 
-//------ widgets -----
-$.fn.composerWidgets["generic_widget_generator"] = function(input_html_generator_fn) {
+//GENERATOR FUNCTION - MAKES IT EASY TO BULID SIMPLE FORM ELEMENTS
+$.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 	return {
 		"initialize": function() {
 			$(this.get("el")).addClass("cTextInput");
@@ -162,22 +162,22 @@ $.fn.composerWidgets["generic_widget_generator"] = function(input_html_generator
 };
 
 
-//generic widgets
-$.fn.composerWidgets["text"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+//GENERIC WIDGETS
+$.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function() { 
 	return "<input type='text' id='" + this.get("id") + "'>"; 
 });
 
-$.fn.composerWidgets["password"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+$.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function() { 
 	return "<input type='password' id='" + this.get("id") + "'>"; 
 });
 
-$.fn.composerWidgets["textarea"] = $.fn.composerWidgets["generic_widget_generator"](function() { 
+$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(function() { 
 	return "<textarea id='" + this.get("id") + "'></textarea>"; 
 });
 
 $.fn.composerWidgets["select"] = $.extend(
 	{}, 
-	$.fn.composerWidgets["generic_widget_generator"](function() {
+	$.fn.composerWidgetsGenerator(function() {
         var html = "<select id='" + this.get("id") + "'>";
         var options = this.get("options");
         
@@ -201,7 +201,7 @@ $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["uploadify"] = {};
 $.fn.composerWidgets["button"] = {};
 
-//weirder wigdgets
+//FANCY WIDGETS
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	"initialize": function() {
 		$(this.get("el")).addClass("cClickInput");
