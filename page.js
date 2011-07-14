@@ -82,13 +82,13 @@ $(document).ready(function() {
         "label": "Multiple choices badass"
     });
     dataset.push({
-        "id": "picker",
+        "id": "picker_numbers",
         "type": "picker",
         "options": ["1", "2", "3", "4"],
         "label": "Pick your number"
     });
     dataset.push({
-        "id": "picker",
+        "id": "picker_strings",
         "type": "picker",
         "options": ["whales", "turtles", "lions", "people"],
         "value": "turtles",

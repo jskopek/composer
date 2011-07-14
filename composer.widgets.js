@@ -200,9 +200,16 @@ $.fn.composerWidgets["picker"] = $.extend({}, $.fn.composerWidgets["text"], {
     "initialize": function() {
         if (!this.value()) { 
             this.value(this.get("options")[0]); 
+            this.set({"index": 0});
         } else {
-            var length = this.get("options").length;
-            for (var i = 0; 
+            for (var o in this.get("options")) {
+                if (this.value() == this.get("options")[o]) {
+                    this.set({"index": Number(o)}); 
+                }
+            }
+            if (!this.get("index")) {
+                this.set({"index": 0});
+            }
         }
 
         var html = "";
@@ -222,14 +229,14 @@ $.fn.composerWidgets["picker"] = $.extend({}, $.fn.composerWidgets["text"], {
         var that = this;
         $(this.get("el")).find("a.back").bind("click", function(e) {
             e.preventDefault();
-            var new_index = that.get("index") - 1;
+            var new_index = Number(that.get("index")) - 1;
             if (new_index < 0) { return; }
             that.set({"index": new_index});
             that.value(that.get("options")[that.get("index")]);
         });
         $(this.get("el")).find("a.next").bind("click", function(e) {
             e.preventDefault();
-            var new_index = that.get("index") + 1;
+            var new_index = Number(that.get("index")) + 1;
             if (new_index >= that.get("options").length) { return; }
             that.set({"index": new_index});
             that.value(that.get("options")[that.get("index")]);
