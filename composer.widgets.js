@@ -195,7 +195,58 @@ $.fn.composerWidgets["select"] = $.extend(
 		}
 	}
 );
-$.fn.composerWidgets["picker"] = {};
+
+$.fn.composerWidgets["picker"] = $.extend({}, $.fn.composerWidgets["text"], {
+    "initialize": function() {
+        if (!this.value()) { 
+            this.value(this.get("options")[0]); 
+            this.set({"index": 0});
+        } else {
+            for (var o in this.get("options")) {
+                if (this.value() == this.get("options")[o]) {
+                    this.set({"index": Number(o)}); 
+                }
+            }
+            if (!this.get("index")) {
+                this.set({"index": 0});
+            }
+        }
+
+        var html = "";
+        if (this.get("label")) {
+            html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
+        }
+
+        html += "<div class='cInput'>";
+        html += "<a href='#' class='cButton back'>Prev</a>";
+        html += "<span class='cPicker'>" + this.get("options")[this.get("index")] + "</span>";
+        html += "<a href='#' class='cButton next'>Next</a>";
+        html += "</div>";
+
+        $(this.get("el")).html(html);
+
+        // Bind for value change
+        var that = this;
+        $(this.get("el")).find("a.back").bind("click", function(e) {
+            e.preventDefault();
+            var new_index = Number(that.get("index")) - 1;
+            if (new_index < 0) { return; }
+            that.set({"index": new_index});
+            that.value(that.get("options")[that.get("index")]);
+        });
+        $(this.get("el")).find("a.next").bind("click", function(e) {
+            e.preventDefault();
+            var new_index = Number(that.get("index")) + 1;
+            if (new_index >= that.get("options").length) { return; }
+            that.set({"index": new_index});
+            that.value(that.get("options")[that.get("index")]);
+        });
+    },
+    "set_value": function(value) {
+        $(this.get("el")).find("span").text(value);
+    }
+});
+
 $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["uploadify"] = {};
 $.fn.composerWidgets["button"] = {};
