@@ -113,10 +113,10 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 			if( this.get("label") ) {
 				html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
 			}
-			html += "<div class='cInput'>";
-			html += input_html_generator_fn.apply(this);
-			html += "</div>";
+			html += "<div class='cInput'></div>";
 			$(this.get("el")).html(html);
+
+			input_html_generator_fn.apply(this, [$(this.get("el")).find(".cInput")]);
 
 			//bind for value change
 			var item = this;
@@ -162,16 +162,20 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 };
 
 //GENERIC WIDGETS
-$.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function() { 
-	return "<input type='text' id='" + this.get("id") + "'>"; 
+$.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function(el) { 
+	$(el).html("<input type='text' id='" + this.get("id") + "'>");
+
+	if( this.get("number") && $.fn.numeric ) {
+		$(el).find("input").numeric({ allow: "-." });
+	}
 });
 
-$.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function() { 
-	return "<input type='password' id='" + this.get("id") + "'>"; 
+$.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function(el) { 
+	$(el).html("<input type='password' id='" + this.get("id") + "'>");
 });
 
-$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(function() { 
-	return "<textarea id='" + this.get("id") + "'></textarea>"; 
+$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(function(el) { 
+	$(el).html("<textarea id='" + this.get("id") + "'></textarea>");
 });
 
 $.fn.composerWidgets["select"] = $.extend(

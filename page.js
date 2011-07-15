@@ -37,6 +37,19 @@ $(document).ready(function() {
 		"longer_than" : 4,
 		"tooltip": "This is a test"
 	});
+
+	dataset.push({
+		"id": "age",
+		"type": "text",
+		"number": true,
+		//"value": "jms",
+		"label": "Age",
+		"validation": ["not_empty", "num_greater_than"],
+		"num_greater_than": 0,
+		"placeholder": "18",
+		"tooltip": "This is a long tooltip that will help the user understand what the purpose of the username field is"
+	});
+
 	dataset.push({
 		"id": "type",
 		"type": "radio",
