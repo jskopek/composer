@@ -221,3 +221,16 @@
 	border: 1px solid #000;
 	color: #fff;
 }
+.cRow.cType_picker a.cButton {
+	border-radius: 0;
+}
+.cRow.cType_picker .cPicker {
+	border-left: none;
+	border-radius: 0;
+}
+.cRow.cType_picker .cPicker:hover {
+	background-color: inherit;
+	-webkit-box-shadow: 0px 0px 2px #777;
+	-moz-box-shadow: 0px 0px 2px #777;
+	background: #f6f6f6;
+}

@@ -200,21 +200,78 @@ $.fn.composerWidgets["select"] = $.extend(
 	}
 );
 
-$.fn.composerWidgets["picker"] = $.extend({}, $.fn.composerWidgets["text"], {
-    "initialize": function() {
-        if (!this.value()) { 
-            this.value(this.get("options")[0]); 
-            this.set({"index": 0});
-        } else {
-            for (var o in this.get("options")) {
-                if (this.value() == this.get("options")[o]) {
-                    this.set({"index": Number(o)}); 
-                }
-            }
-            if (!this.get("index")) {
-                this.set({"index": 0});
+$.fn.composerWidgets["picker"] = $.extend({}, 
+	$.fn.composerWidgetsGenerator(function(el) {
+		var html = "";
+		html += "<div class='cInput'>";
+        html += "<a href='#' class='cButton cPickerBack'>&#9664</a>";
+        html += "<span class='cButton cPicker'></span>";
+        html += "<a href='#' class='cButton cPickerNext'>&#9658</a>";
+        html += "</div>";
+		$(el).html(html);
+
+        // Bind for value change
+        var item = this;
+        $(this.get("el")).find("a.cPickerBack").bind("click", function(e) {
+            e.preventDefault();
+
+            var new_index = Number(item.get("index")) - 1;
+            if (new_index < 0) { return; }
+
+            item.set({"index": new_index});
+        });
+        $(this.get("el")).find("a.cPickerNext").bind("click", function(e) {
+            e.preventDefault();
+
+            var new_index = Number(item.get("index")) + 1;
+            if (new_index >= item.get("options").length) { return; }
+
+            item.set({"index": new_index});
+        });
+
+		this.bind("change:options", function() {
+			this.trigger("change:index");
+		});
+
+		this.bind("change:index", function() {
+			var value = item.get("options")[ item.get("index") ];
+			item.get("el").find(".cPicker").html( value );
+		});
+		if( !this.get("index") ) {
+			this.set({"index": 0});
+		}
+		this.trigger("change:index");
+	}),
+	{
+		"set_value": function(value) {
+			var index = false;
+			for (var index_check in this.get("options")) {
+				if (value == this.get("options")[index_check]) {
+					index = index_check;
+					break;
+				}
+			}
+
+			if( index ) {
+				this.set({"index": index});
+			}
+		}	
+	}
+);
+
+$.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], {
+	"get_index": function(value) {
+		for (var index in this.get("options")) {
+            if (value == this.get("options")[index]) {
+                return index;
             }
         }
+		return false;
+	},
+    "initialize": function() {
+		if( !this.get("options") ) {
+			this.set({"options": []});
+		}
 
         var html = "";
         if (this.get("label")) {

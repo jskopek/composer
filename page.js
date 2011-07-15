@@ -106,7 +106,7 @@ $(document).ready(function() {
         "id": "picker_strings",
         "type": "picker",
         "options": ["whales", "turtles", "lions", "people"],
-        "value": "turtles",
+		"index": 2,
         "label": "Pick your string"
     });
 
