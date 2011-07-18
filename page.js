@@ -94,6 +94,7 @@ $(document).ready(function() {
 			});
 		},
         "sortable": true,
+        "validation": ["not_empty"],
         "label": "Multiple choices badass"
     });
     dataset.push({
@@ -106,8 +107,27 @@ $(document).ready(function() {
         "id": "picker_strings",
         "type": "picker",
         "options": ["whales", "turtles", "lions", "people"],
-		"index": 2,
+        "value": "turtles",
         "label": "Pick your string"
+    });
+    dataset.push({
+        "id": "sorting_test",
+        "type": "set",
+        "structure": function(row) {
+            var html = "";
+            html += row.generateSortButton();
+            html += "<input type='text' value='" + row.value + "' style='width:75%' />";
+            html += row.generateUploadButton();
+            html += row.generateDeleteButton();
+
+            $(row.el).html(html);
+
+            $(row.el).find("input").bind("change", function() {
+                row.setValue($(this).val());
+            });
+        },
+        "sortable": true,
+        "label": "Ordering question"
     });
 
 	c = $("#form1 .form_container").composer();

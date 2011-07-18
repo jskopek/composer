@@ -45,32 +45,6 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 
 		//bind for value change
 		var item = this;
-		$(this.get("el")).find("a.add").bind("click", function(e) {
-			e.preventDefault();
-			var val = $.extend([],item.value());
-			val.push("");
-			item.value( val );
-
-			if( item.get("add") ) {
-				item.get("add").apply(this, [item.get("el").find("li:last")]);
-			}
-
-		});
-
-		$("a.delete").live("click", function(e) {
-			e.preventDefault();
-
-			var index = $(this).parents("li").index();
-
-			var index_el = item.get("el").find("li:eq(" + index + ")");
-			if( item.get("delete") ) {
-				item.get("delete").apply(this, [index_el]);
-			}
-
-			var val = $.extend([],item.value());
-			val.splice(index, 1);
-			item.value( val );
-		});
 
 
 		//placeholder handler
@@ -106,10 +80,64 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 				},
 				"generateDeleteButton": function() {
 					return "<a href='#' class='cButton delete'>Delete</a>";
-				}
+				},
+                "generateUploadButton": function() {
+                    return "<a href='#' class='cButton upload'>Upload</a>";
+                },
 			};
 			this.get("structure").apply(this, [method]);
 		}			
+
+
+        // Bind delete button on newly created li
+		this.get("el").find("a.delete").click("click", function(e) {
+			e.preventDefault();
+
+			var index = $(this).parents(".cRow").find("li").index();
+
+			var index_el = item.get("el").find("li:eq(" + index + ")");
+			if( item.get("delete") ) {
+				item.get("delete").apply(this, [index_el]);
+			}
+
+			var val = $.extend([],item.value());
+			val.splice(index, 1);
+			item.value( val );
+		});
+
+		this.get("el").find("a.add").bind("click", function(e) {
+			e.preventDefault();
+			var val = $.extend([],item.value());
+			val.push("");
+			item.value( val );
+
+			if( item.get("add") ) {
+				item.get("add").apply(this, [item.get("el").find("li:last")]);
+			}
+
+		});
+
+        this.get("el").find("a.upload").click("click", function(e) {
+            e.preventDefault();
+
+            var index = $(this).parents("li").index();
+            var item2 = $(this).parents(".cRow").data("item");
+            
+            var index_el = item.get("el").find("li:eq(" + index + ")");
+            if (item.get("upload")) {
+                item.get("upload").apply(this, [index_el]);
+            }
+            
+            // Create a file upload form
+            var upload_form = $("<div id='' class='form_container'></div>");
+            upload_form.composer({
+                "id": item.get("id") + "_upload",
+                "type": "uploadify",
+                "label": "Upload image"
+            });
+            index_el.append(upload_form);
+        });
+
 	}
 });
 
