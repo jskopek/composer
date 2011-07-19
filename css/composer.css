@@ -170,11 +170,11 @@
 }
 .cRow .cValidation.valid {
 	display: block;
-	background: url(http://cdn2.iconfinder.com/data/icons/bwpx/icons/symbol_check.gif);	
+	background: url(composer_images/symbol_check.gif);	
 }
 .cRow .cValidation.invalid {
 	display: block;
-	background: url(http://cdn4.iconfinder.com/data/icons/spirit20/system-error-alt.png);
+	background: url(composer_images/system-error-alt.png);
 }
 
 .cRow .cValidation span {
@@ -201,7 +201,7 @@
 	width: 16px;
 	height: 16px;	
 	cursor: pointer;
-	background: no-repeat url(http://cdn4.iconfinder.com/data/icons/Icon_for_MealKeeper__s_soft_by_shlyapnikova/help_16.png);
+	background: no-repeat url(composer_images/help_16.png);
 	margin-left: 7px;
 }
 
