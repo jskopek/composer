@@ -18,7 +18,16 @@ $(document).ready(function() {
 		"longer_than": 4
 	};
 
-	var dataset	= [data, data2];
+	var dataset	= [];
+	
+	dataset.push({
+		"id": "basic_info",
+		"type": "fieldset",
+		"label": "Basic Info",
+		"value": [data, data2],
+		"collapsible": true,
+		"collapsed": true
+	});
 
 	dataset.push({
 		"id": "feedback",

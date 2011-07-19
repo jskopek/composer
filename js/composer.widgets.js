@@ -161,6 +161,7 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 	};
 };
 
+
 //GENERIC WIDGETS
 $.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function(el) { 
 	$(el).html("<input type='text' id='" + this.get("id") + "'>");
@@ -324,6 +325,52 @@ $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["button"] = {};
 
 //FANCY WIDGETS
+$.fn.composerWidgets["fieldset"] = {
+	"initialize": function() {
+		this.get("el").html("<fieldset id='cId_" + this.get("id") + "'><legend>" + this.get("label") + "</legend><div class='cFieldsetData'></div></fieldset>");
+
+		var value = $.extend([], this.value() );
+		for( var index in value ) {
+			value[index]["container_el"] = this.get("el").find(".cFieldsetData");
+		}
+
+
+		if( this.get("collapsible") ) {
+			this.get("el").addClass("cCollapsible");
+
+			//initialize collapsed property, if it has not been set
+			if( this.get("collapsed") == undefined ) {
+			   this.set({"collapsed": false });
+			}
+
+			//bind function that hides or shows fieldset on collapsed property change
+			this.bind("change:collapsed", function() {
+				if( this.get("collapsed") === true ) {
+					this.get("el").addClass("cCollapsed");
+				} else {
+					this.get("el").removeClass("cCollapsed");
+				}
+			});
+
+			//trigger collapse handler in order to initialize with proper collapsed view
+			this.trigger("change:collapsed");
+
+			//update collapsed status, and re
+			var item = this;
+			this.get("el").find("legend").click(function(e){
+				e.preventDefault();
+				item.set({ "collapsed": !item.get("collapsed") });
+			});
+		}
+		
+		this.collection.add( value );
+	},
+	"set_value": function() {},
+	"set_tooltip": function() {},
+	"set_placeholder": function() {},
+	"set_validation_message": function() {}
+};
+
 $.fn.composerWidgets["html"] = 	{
 	"initialize": function() {
 		this.get("el").html( this.value() );

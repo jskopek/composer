@@ -2,7 +2,7 @@
 /*body {
 	font-size: 12px;
 }
-.c_row input[type=checkbox] {
+.c_rowWW input[type=checkbox] {
 	margin-right: 14px;
 }
 .c_row input[type=radio] {
@@ -250,4 +250,33 @@
 
 .cRow .upload_item p {
     padding: 10px 10px 0px 10px;
+}
+
+/* fieldset styling */
+.cType_fieldset legend {
+	padding: 0 10px;
+	
+}
+.cType_fieldset.cCollapsible legend {
+	padding-left: 18px;
+	background-image: url(composer_images/fieldset_collapsible_open.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+	cursor: pointer;
+}
+.cType_fieldset.cCollapsible.cCollapsed legend {
+	background-image: url(composer_images/fieldset_collapsible.png);
+}
+.cType_fieldset.cCollapsible fieldset {
+	margin: 0;
+	padding: 8px;
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
+}
+.cType_fieldset.cCollapsible.cCollapsed fieldset {
+	padding: 0 8px;
+}
+.cType_fieldset.cCollapsible.cCollapsed .cFieldsetData {
+	display: none;
 }

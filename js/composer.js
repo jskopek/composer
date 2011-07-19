@@ -5,7 +5,10 @@ var composerItem = Backbone.Model.extend({
 		}
 
 		var el = $("<div></div>").addClass("cRow").addClass("cType_" + this.get("type")).attr("id", "cId_" + this.get("id"));
-		$(this.collection.el).append(el);
+
+		var container_el = this.get("container_el") ? this.get("container_el") : this.collection.el;
+		$(container_el).append(el);
+
 		this.set({"el": el});
 
 		var that = this;
