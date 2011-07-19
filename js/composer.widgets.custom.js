@@ -3,6 +3,8 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 
 		//initialize value, if it is not passed in
 		if( !this.value() ) { this.value([""]); }
+		if( !this.get("set_wrapper") ) { this.set({"set_wrapper": "<ul class='cSetWrapper'></ul>"}); }
+		if( !this.get("structure_wrapper") ) { this.set({"structure_wrapper": "<li></li>"}); }
 
 		$(this.get("el")).addClass("cTextInput");
 
@@ -11,17 +13,14 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
 		}
 		html += "<div class='cInput'>";
-
-		html += "<ul>";
-		html += "</ul>";
-		html += "<a href='#' class='cButton add'>Add</a>";
-
+			html += this.get("set_wrapper");
+			html += "<a href='#' class='cButton add'>Add</a>";
 		html += "</div>";
 		$(this.get("el")).html(html);
 
 		var that = this;
 		if( this.get("sortable") && $.fn.sortable ) {
-			$(this.get("el")).find("ul").sortable({
+			$(this.get("el")).find(".cSetWrapper").sortable({
 				"axis": "y",
 				"handle": ".cSortHandle",
 				"containment": "parent",
@@ -64,15 +63,17 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 	},
 	"set_value": function(value) {
 		var val = this.value();
-		var ul = this.get("el").find("ul").html("");
+		var set_el = this.get("el").find(".cSetWrapper").html("");
 
 		var item = this;
 		for( var index in val ) {
-			var el = $("<li></li>");
-			ul.append(el);
+			var el = $( this.get("structure_wrapper") );
+			el.addClass("cSetItem");
+			set_el.append(el);
 			
 			var method = {
 				"id": this.get("id"),
+				"index": index,
 				"value": val[index],
 				"el": el,
 				"setValue": function(item) {
@@ -97,19 +98,19 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 				},
                 "generateUploadButton": function() {
                     return "<a href='#' class='cButton upload'>Upload</a>";
-                },
+                }
 			};
 			this.get("structure").apply(this, [method]);
 		}			
 
 
-        // Bind delete button on newly created li
+        // Bind delete button on newly created set item
 		this.get("el").find("a.delete").click(function(e) {
 			e.preventDefault();
 
-			var index = $(this).parents(".cRow").find("li").index();
+			var index = $(this).parents(".cRow").find(".cSetItem").index();
 
-			var index_el = item.get("el").find("li:eq(" + index + ")");
+			var index_el = item.get("el").find(".cSetItem:eq(" + index + ")");
 			if( item.get("delete") ) {
 				item.get("delete").apply(this, [index_el]);
 			}

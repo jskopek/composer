@@ -169,7 +169,7 @@ $(document).ready(function() {
                     // Remove upload form
                     row.el.find("div.form_container").remove();
                 });
-            };
+            }
 
             $(row.el).find("input").bind("change", function() {
                 row.setValue($(this).val());
@@ -179,6 +179,18 @@ $(document).ready(function() {
         "sortable": true,
         "label": "Ordering question"
     });
+
+	dataset.push({
+		"id": "set_1",
+		"type": "set",
+		"set_wrapper": "<table><tr><th>Sort</th><th>Value</th><th>Delete</th></tr><tbody class='cSetWrapper'></tbody>",
+		"structure_wrapper": "<tr></tr>",
+		"structure": function(row) {
+			$(row.el).html( "<td>" + row.generateSortButton() + "</td><td>" + row.value + "</td><td>" + row.generateDeleteButton() + "</td>");
+		},
+		"value": ["apple", "orange", "bannana"],
+		"sortable": true
+	});
 
 	c = $("#form1 .form_container").composer();
 	c.add( dataset );
