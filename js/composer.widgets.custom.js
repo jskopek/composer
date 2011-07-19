@@ -108,7 +108,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		this.get("el").find("a.delete").click(function(e) {
 			e.preventDefault();
 
-			var index = $(this).parents(".cRow").find(".cSetItem").index();
+            var index = $(this).parent().index();
 
 			var index_el = item.get("el").find(".cSetItem:eq(" + index + ")");
 			if( item.get("delete") ) {
