@@ -45,7 +45,17 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 
 		//bind for value change
 		var item = this;
+		$(this.get("el")).find("a.add").bind("click", function(e) {
+			e.preventDefault();
+			var val = $.extend([],item.value());
+			val.push("");
+			item.value( val );
 
+			if( item.get("add") ) {
+				item.get("add").apply(this, [item.get("el").find("li:last")]);
+			}
+
+		});
 
 		//placeholder handler
 		$.fn.composerWidgets["text"].set_placeholder.apply(this);
@@ -68,7 +78,11 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 				"setValue": function(item) {
 					var el = this;
 					return function(val) {
-						item.value()[ el.index() ] = val;
+                        var value = $.extend([], item.value());
+                        //var value = item.value();
+                        value[ el.index() ] = val;
+                        item.value( value );
+						//item.value()[ el.index() ] = val;
 					};
 				}.apply(el, [this]),
 				"generateSortButton": function() {
@@ -90,7 +104,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 
 
         // Bind delete button on newly created li
-		this.get("el").find("a.delete").click("click", function(e) {
+		this.get("el").find("a.delete").click(function(e) {
 			e.preventDefault();
 
 			var index = $(this).parents(".cRow").find("li").index();
@@ -104,40 +118,6 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			val.splice(index, 1);
 			item.value( val );
 		});
-
-		this.get("el").find("a.add").bind("click", function(e) {
-			e.preventDefault();
-			var val = $.extend([],item.value());
-			val.push("");
-			item.value( val );
-
-			if( item.get("add") ) {
-				item.get("add").apply(this, [item.get("el").find("li:last")]);
-			}
-
-		});
-
-        this.get("el").find("a.upload").click("click", function(e) {
-            e.preventDefault();
-
-            var index = $(this).parents("li").index();
-            var item2 = $(this).parents(".cRow").data("item");
-            
-            var index_el = item.get("el").find("li:eq(" + index + ")");
-            if (item.get("upload")) {
-                item.get("upload").apply(this, [index_el]);
-            }
-            
-            // Create a file upload form
-            var upload_form = $("<div id='' class='form_container'></div>");
-            upload_form.composer({
-                "id": item.get("id") + "_upload",
-                "type": "uploadify",
-                "label": "Upload image"
-            });
-            index_el.append(upload_form);
-        });
-
 	}
 });
 
