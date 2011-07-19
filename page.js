@@ -94,6 +94,7 @@ $(document).ready(function() {
 			});
 		},
         "sortable": true,
+        "validation": ["not_empty"],
         "label": "Multiple choices badass"
     });
     dataset.push({
@@ -106,8 +107,77 @@ $(document).ready(function() {
         "id": "picker_strings",
         "type": "picker",
         "options": ["whales", "turtles", "lions", "people"],
-		"index": 2,
+        "value": "turtles",
         "label": "Pick your string"
+    });
+    dataset.push({
+        "id": "sorting_test",
+        "type": "set",
+        "structure": function(row) {
+            var html = "";
+            html += row.generateSortButton();
+            html += "<input type='text' value='" + row.value + "' style='width:75%' />";
+            html += row.generateUploadButton();
+            html += row.generateDeleteButton();
+
+            $(row.el).html(html);
+
+            var pattern = new RegExp('^(https?:\/\/)?');
+            if (pattern.test(row.value) && row.value !== "") {
+                row.el.find("input").attr("disabled", "true");
+                row.el.find("a.upload").text("Cancel");
+                row.el.find("a.upload").bind("click", function(e) {
+                    e.preventDefault();
+
+                    // Change cancel button back to upload
+                    $(this).text("Upload");
+                    row.setValue("");
+
+                    // Remove upload form
+                    row.el.find("div.form_container").remove();
+                });
+            } else {
+                $(row.el).find("a.upload").toggle(function(e) {
+                    e.preventDefault();
+
+                    // Create a file upload form
+                    var upload_form = $("<div id='' class='form_container'></div>");
+                    var id = row.id + "_upload";
+                    var c = upload_form.composer({
+                        "id": id,
+                        "type": "uploadify",
+                        "label": "Upload image"
+                    });
+
+                    c.get(id).bind("change", function() {
+                        if (this.is_valid()) {
+                            row.setValue(this.get("value"));
+                        }
+                    });
+
+                    // Change upload button to cancel
+                    $(this).text("Cancel");
+
+                    row.el.append(upload_form);
+                }, function(e) {
+                    e.preventDefault();
+
+                    // Change cancel button back to upload
+                    $(this).text("Upload");
+                    row.setValue("");
+
+                    // Remove upload form
+                    row.el.find("div.form_container").remove();
+                });
+            };
+
+            $(row.el).find("input").bind("change", function() {
+                row.setValue($(this).val());
+            });
+
+        },
+        "sortable": true,
+        "label": "Ordering question"
     });
 
 	c = $("#form1 .form_container").composer();

@@ -308,8 +308,19 @@ $.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], 
     }
 });
 
+$.fn.composerWidgets["uploadify"] = $.extend({},
+    $.fn.composerWidgetsGenerator(function(el) {
+    $(el).append("Uploadify form will go here. Press <a href='#'>here</a> to simulate.");
+
+    // Simulate a mouse click handler... This is just a stub
+    var item = this;
+    $(el).find("a").bind("click", function(e) {
+        e.preventDefault();
+        item.value("http://www.google.com/image.png");
+    });
+}));
+
 $.fn.composerWidgets["number"] = {};
-$.fn.composerWidgets["uploadify"] = {};
 $.fn.composerWidgets["button"] = {};
 
 //FANCY WIDGETS
