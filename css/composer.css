@@ -252,6 +252,17 @@
     padding: 10px 10px 0px 10px;
 }
 
+.cRow.cType_hidden {
+	display: none;
+}
+
+.cRow.cType_html {
+	border: none;
+	background: none;
+	margin: 0;
+	padding: 0;
+}
+
 /* fieldset styling */
 .cType_fieldset legend {
 	padding: 0 10px;

@@ -21,6 +21,12 @@ $(document).ready(function() {
 	var dataset	= [];
 	
 	dataset.push({
+		"id": "hidden_stuff",
+		"type": "hidden",
+		"value": "test value"
+	});
+	
+	dataset.push({
 		"id": "basic_info",
 		"type": "fieldset",
 		"label": "Basic Info",

@@ -26,7 +26,9 @@ var composerItem = Backbone.Model.extend({
 		//trigger validation on item value change
 		this.bind("change:value", function() {
 			var widget = this.get_widget();
-			widget.set_value.apply(this, [ this.get("value") ]);
+			if( widget.set_value ) {
+				widget.set_value.apply(this, [ this.get("value") ]);
+			}
 
 			var is_valid = this.is_valid();
 			this.trigger( is_valid ? "valid" : "invalid" );
@@ -74,13 +76,20 @@ var composerItem = Backbone.Model.extend({
 			}
 
 			var result = validation.apply(this, [this.value()]);
-			if( result !== true ) {
-				if( typeof result === "string" ) {
-					this.get_widget().set_validation_message.apply(this, [result]);
+
+			//set validation message
+			if( this.get_widget().set_validation_message ) {
+				if( result !== true ) {
+					if( typeof result === "string" ) {
+						this.get_widget().set_validation_message.apply(this, [result]);
+					}
+				} else {
+					this.get_widget().set_validation_message.apply(this, [false]);
 				}
+			}
+
+			if( result !== true ) { 
 				return false;
-			} else {
-				this.get_widget().set_validation_message.apply(this, [false]);
 			}
 		}
 

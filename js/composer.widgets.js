@@ -364,19 +364,19 @@ $.fn.composerWidgets["fieldset"] = {
 		}
 		
 		this.collection.add( value );
-	},
-	"set_value": function() {},
-	"set_tooltip": function() {},
-	"set_placeholder": function() {},
-	"set_validation_message": function() {}
+	}
+};
+
+$.fn.composerWidgets["hidden"] = {
+	"initialize": function() {
+		this.get("el").html("<input type='hidden' id='" + this.get("id") + "' value='" + this.value() + "'/>");
+	}
 };
 
 $.fn.composerWidgets["html"] = 	{
 	"initialize": function() {
 		this.get("el").html( this.value() );
-	},
-	"set_value": function( val ) {},
-	"set_validation_message": function(msg) {}
+	}
 };
 
 $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
