@@ -309,17 +309,92 @@ $.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], 
     }
 });
 
-$.fn.composerWidgets["uploadify"] = $.extend({},
+$.fn.composerWidgets["uploadify"] = $.extend({}, 
     $.fn.composerWidgetsGenerator(function(el) {
-    $(el).append("Uploadify form will go here. Press <a href='#'>here</a> to simulate.");
+        if (!this.get("options")) {
+            this.set({"options": []});
+        }
 
-    // Simulate a mouse click handler... This is just a stub
-    var item = this;
-    $(el).find("a").bind("click", function(e) {
-        e.preventDefault();
-        item.value("http://www.google.com/image.png");
-    });
-}));
+        var html = "";
+        if (this.get("label")) {
+            // Show label if it's been specified
+            html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
+        }
+
+        html += "<div class='cInput'>";
+        html += "<input id='" + this.get("id") + "' type='file_upload' />";
+        html += "</div>";
+
+        $(this.get("el")).html(html);
+
+        var uploadify_item = this;
+        publisher.send({
+            "module": "publisher", 
+            "command": "get_uploadify_properties", 
+            "args": {}, 
+            "success": function(data, args) {
+                args["scriptData"]["policy"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["policy"]));
+                args["scriptData"]["signature"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["signature"]));
+                var uploadify_args = $.extend(args, {
+                    // Uploadify properties
+                    "uploader": site_data.settings.MEDIA_URL + "uploadify.swf",
+                    "buttonImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_upload.png",
+                    "cancelImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_cancel.png",
+                    "auto": true,
+                    "fileExt": "*.bmp;*.jpeg;*.jpg;*.png;*.gif;*.tiff",
+                    "fileDesc": "*.bmp;*.jpeg;*.jpg;*.png;*.gif;*.tiff",
+                    "buttonText": "Upload",
+                    "multi": false,
+                    "width": 71,
+                    "height": 20,
+                    "onSelectOnce": function(e, d) {
+                        // TODO
+                    },
+                    "onError": function(e, queueID, fileObj, errorObj) {
+                        if (errorObj.type === "File Size") {
+
+                        } else if (errorObj.info === 201) {
+                            // Flash for OS X treats 201 success messages as errors.
+                            fileUploaded(e, queueID, fileObj);
+                        }
+                    },
+                    "onComplete": function(e, queueID, fileObj) {
+                        // Construct absolute URL of the image
+                        var location = args["script"] + "/" + args["key"];
+                        // Replace the ${filename} placeholder with the real filename
+                        location = location.replace("${filename}", fileObj.name);
+
+                        // TODO: progressbar
+
+                        // Create FileObj on server
+                        publisher.send({
+                            "module": "publisher",
+                            "command": "add_uploaded_file",
+                            "args": {
+                                "location": location,
+                                "file_name": fileObj.name,
+                                "size": fileObj.size
+                            },
+                            "success": function(data, args) {
+                                // FileObj has been created 
+                                uploadify_item.value(fileObj.name);
+                            }
+                        });
+                    }
+                });
+
+                $(uploadify_item.get("el")).find("input#" + uploadify_item.get("id")).uploadify(uploadify_args);
+            }
+        });
+    }),
+    {
+        "set_value": function(value) {
+            // TODO
+            this.get("el").find(".cInput").append("<p>" + value + "</p>");
+        }
+    }
+);
+
 
 $.fn.composerWidgets["number"] = {};
 $.fn.composerWidgets["button"] = {};
