@@ -148,7 +148,18 @@ var composerCollection = Backbone.Collection.extend({
 					});
 					return is_valid;
 				},
-				"values": function() {
+				"values": function( val ) {
+                    //if dictionary of new values is passed, update the items
+                    if( val ) {
+                        collection.each(function(item) {
+                            var new_item_val = val[ item.get("id") ];
+                            if( new_item_val ) {
+                                item.value( new_item_val );
+                            }
+                        });
+                    }
+
+                    //return dictionary of values
 					var values = {};
 					collection.each(function(item) {
 						values[ item.get("id") ] = item.value();
