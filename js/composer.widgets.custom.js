@@ -119,7 +119,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 
 
         // Bind delete button on newly created set item
-		this.get("el").find("a.delete").click(function(e) {
+        this.get("el").find("a.delete").unbind("click").click(function(e) {
 			e.preventDefault();
 
 			var index = $(this).parents(".cSetItem").index();
