@@ -39,9 +39,6 @@ var composerItem = Backbone.Model.extend({
 		});
 
 		//inform the collection of certain event changes
-		this.bind("change:value", function() {
-			this.collection.trigger("change", this);
-		});
 		this.bind("change:valid", function() {
 			this.collection.trigger("valid", this);
 		});
