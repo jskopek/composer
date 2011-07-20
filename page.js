@@ -195,15 +195,25 @@ $(document).ready(function() {
         "label": "Ordering question"
     });
 
+	dataset = [];
 	dataset.push({
 		"id": "set_1",
 		"type": "set",
-		"set_wrapper": "<table><tr><th>Sort</th><th>Value</th><th>Delete</th></tr><tbody class='cSetWrapper'></tbody>",
+		"set_wrapper": "<table><tr><th>Sort</th><th>Value</th><th>Delete</th></tr><tbody class='cSetWrapper'></tbody></table>",
 		"structure_wrapper": "<tr></tr>",
 		"structure": function(row) {
-			$(row.el).html( "<td>" + row.generateSortButton() + "</td><td>" + row.value + "</td><td>" + row.generateDeleteButton() + "</td>");
+			if( !row.value() ) {
+				row.value( "test_" + row.index );
+			}
+
+			$(row.el).html( "<td>" + row.generateSortButton() + "</td><td><input type='text' value='" + row.value() + "'/></td><td>" + row.generateDeleteButton() + "</td>");
+
+			$(row.el).find("input").bind("change", function() {
+				row.value( $(this).val() );
+			});
 		},
-		"value": ["apple", "orange", "bannana"],
+		//"value": ["apple", "orange", "bannana"],
+		"value": ["", ""],
 		"sortable": true
 	});
 
@@ -224,14 +234,16 @@ $(document).ready(function() {
 	c2.add( data2 );
 
 	//events
-	c.bind("change", function() { console.log("form.change"); });
-	c.bind("add", function() { console.log("form.add"); });
-	c.bind("remove", function() { console.log("form.remove"); });
-	c.bind("valid", function() { console.log("form.valid"); });
-	c.bind("invalid", function() { console.log("form.invalid"); });
+	c.bind("change", function(e) { 
+		console.log("form.change", e.value()); 
+	});
+	/*c.bind("add", function() { console.log("form.add"); });*/
+	/*c.bind("remove", function() { console.log("form.remove"); });*/
+	/*c.bind("valid", function() { console.log("form.valid"); });*/
+	/*c.bind("invalid", function() { console.log("form.invalid"); });*/
 
-	c.get("username").bind("change", function() { console.log("username.change"); });
-	c.get("username").bind("click", function() { console.log("username.click"); });
-	c.get("username").bind("valid", function() { console.log("username.valid"); });
-	c.get("username").bind("invalid", function() { console.log("username.invalid"); });
+	/*c.get("username").bind("change", function() { console.log("username.change"); });*/
+	/*c.get("username").bind("click", function() { console.log("username.click"); });*/
+	/*c.get("username").bind("valid", function() { console.log("username.valid"); });*/
+	/*c.get("username").bind("invalid", function() { console.log("username.invalid"); });*/
 });

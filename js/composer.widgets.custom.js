@@ -29,7 +29,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 					ui.item.data("originIndex", ui.item.index());
 				},
 				"stop": function(evt, ui) {
-					var value = that.value();
+					var value = $.extend([], that.value());
 					var originIndex = ui.item.data("originIndex");
 					var currentIndex = ui.item.index();
 	
@@ -38,6 +38,8 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 	
 					value[originIndex] = swapB;
 					value[currentIndex] = swapA;
+
+					that.value( value );
 				}
 			});
 		}
@@ -65,12 +67,20 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		var val = this.value();
 		var set_el = this.get("el").find(".cSetWrapper").html("");
 
-		var item = this;
+		//we initize the elements first
 		for( var index in val ) {
-			var el = $( this.get("structure_wrapper") );
-			el.addClass("cSetItem");
+			var el = $( this.get("structure_wrapper") ).addClass("cSetItem");
 			set_el.append(el);
+		}
+
+		//we call the 'structure' method for each initalized el
+		//we do this seperately because the structure functions may modify the value,
+		//which causes a recursive loop
+		for( index in val ) {
+			el = this.get("el").find(".cSetWrapper .cSetItem:eq(" + index + ")");
 			
+
+			var item = this;
 			var method = {
 				"id": this.get("id"),
 				"index": index,
@@ -112,7 +122,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		this.get("el").find("a.delete").click(function(e) {
 			e.preventDefault();
 
-			var index = $(this).parents(".cRow").find(".cSetItem").index();
+			var index = $(this).parents(".cSetItem").index();
 
 			var index_el = item.get("el").find(".cSetItem:eq(" + index + ")");
 			if( item.get("delete") ) {
