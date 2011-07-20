@@ -195,7 +195,6 @@ $(document).ready(function() {
         "label": "Ordering question"
     });
 
-	dataset = [];
 	dataset.push({
 		"id": "set_1",
 		"type": "set",

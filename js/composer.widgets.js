@@ -104,8 +104,8 @@
 */
 
 //GENERATOR FUNCTION - MAKES IT EASY TO BULID SIMPLE FORM ELEMENTS
-$.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
-	return {
+$.fn.composerWidgetsGenerator = function(input_html_generator_fn, extend_fn_dict) {
+	var widget = {
 		"initialize": function() {
 			$(this.get("el")).addClass("cTextInput");
 
@@ -125,11 +125,12 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 			});
 
 			//placeholder handler
-			$.fn.composerWidgets["text"].set_placeholder.apply(this);
-			$.fn.composerWidgets["text"].set_tooltip.apply(this);
+			this.get_widget().set_placeholder.apply(this);
+			this.get_widget().set_tooltip.apply(this);
 		},
 		"set_value": function( val ) {
 			$(this.get("el")).find("input").val( val );
+
 		},
 		"set_tooltip": function() {
 			if( this.get("tooltip") ) {
@@ -147,6 +148,13 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 			if( this.value() ) {
 				$(this.get("el")).find(".cPlaceholder").hide();
 			}
+
+			//re-run the set_placholder command on value change (e.g. a form element's value changed programmatically)
+			var item = this;
+			this.bind("change:value", function() {
+				item.get_widget().set_placeholder.apply(this);
+			});
+
 			$(this.get("el")).find("input").add( $(this.get("el")).find("textarea") ).bind("keyup", function() {
 				$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
 			});
@@ -159,6 +167,11 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn) {
 			}
 		}
 	};
+
+    if( extend_fn_dict ) {
+        $.extend(widget, extend_fn_dict);
+    }
+    return widget;
 };
 
 
@@ -175,9 +188,16 @@ $.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function(el) {
 	$(el).html("<input type='password' id='" + this.get("id") + "'>");
 });
 
-$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(function(el) { 
-	$(el).html("<textarea id='" + this.get("id") + "'></textarea>");
-});
+$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(
+    function(el) {
+        $(el).html("<textarea id='" + this.get("id") + "'></textarea>");
+    },
+    {
+        "set_value": function( val ) {
+            $(this.get("el")).find("textarea").val( val );
+        }
+    }
+);
 
 $.fn.composerWidgets["select"] = $.extend(
 	{}, 
@@ -352,6 +372,7 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
                     },
                     "onError": function(e, queueID, fileObj, errorObj) {
                         if (errorObj.type === "File Size") {
+							var x; //pass js lint
 
                         } else if (errorObj.info === 201) {
                             // Flash for OS X treats 201 success messages as errors.
