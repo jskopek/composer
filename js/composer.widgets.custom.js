@@ -32,13 +32,13 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 					var value = $.extend([], that.value());
 					var originIndex = ui.item.data("originIndex");
 					var currentIndex = ui.item.index();
-	
-					var swapA = value[originIndex];
-					var swapB = value[currentIndex];
-	
-					value[originIndex] = swapB;
-					value[currentIndex] = swapA;
 
+					//remove the value from the origin index
+					var originValue = value.splice(originIndex, 1);
+
+					//insert the value at the new index
+					value.splice(currentIndex, 0, originValue[0]);
+	
 					that.value( value );
 				}
 			});
