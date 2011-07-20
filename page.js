@@ -99,13 +99,13 @@ $(document).ready(function() {
         "structure": function(row) {
 			var html = "";
 			html += row.generateSortButton();
-			html += "<input type='text' value='" + row.value + "' style='width:80%'/>";
+			html += "<input type='text' value='" + row.value() + "' style='width:80%'/>";
 			html += row.generateDeleteButton();
 
 			$(row.el).html(html);
 			
 			$(row.el).find("input").bind("change", function() {
-				row.setValue( $(this).val() );
+				row.value( $(this).val() );
 			});
 		},
         "sortable": true,
@@ -131,14 +131,14 @@ $(document).ready(function() {
         "structure": function(row) {
             var html = "";
             html += row.generateSortButton();
-            html += "<input type='text' value='" + row.value + "' style='width:75%' />";
+            html += "<input type='text' value='" + row.value() + "' style='width:75%' />";
             html += row.generateUploadButton();
             html += row.generateDeleteButton();
 
             $(row.el).html(html);
 
             var pattern = new RegExp('^(https?:\/\/)?');
-            if (pattern.test(row.value) && row.value !== "") {
+            if (pattern.test(row.value()) && row.value() !== "") {
                 row.el.find("input").attr("disabled", "true");
                 row.el.find("a.upload").text("Cancel");
                 row.el.find("a.upload").bind("click", function(e) {
@@ -146,7 +146,7 @@ $(document).ready(function() {
 
                     // Change cancel button back to upload
                     $(this).text("Upload");
-                    row.setValue("");
+                    row.value("");
 
                     // Remove upload form
                     row.el.find("div.form_container").remove();
@@ -166,7 +166,7 @@ $(document).ready(function() {
 
                     c.get(id).bind("change", function() {
                         if (this.is_valid()) {
-                            row.setValue(this.get("value"));
+                            row.value(this.get("value"));
                         }
                     });
 
@@ -179,7 +179,7 @@ $(document).ready(function() {
 
                     // Change cancel button back to upload
                     $(this).text("Upload");
-                    row.setValue("");
+                    row.value("");
 
                     // Remove upload form
                     row.el.find("div.form_container").remove();
@@ -187,7 +187,7 @@ $(document).ready(function() {
             }
 
             $(row.el).find("input").bind("change", function() {
-                row.setValue($(this).val());
+                row.value($(this).val());
             });
 
         },

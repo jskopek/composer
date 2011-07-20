@@ -74,16 +74,20 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			var method = {
 				"id": this.get("id"),
 				"index": index,
-				"value": val[index],
 				"el": el,
-				"setValue": function(item) {
+				"value": function(item) {
 					var el = this;
 					return function(val) {
-                        var value = $.extend([], item.value());
-                        //var value = item.value();
-                        value[ el.index() ] = val;
-                        item.value( value );
-						//item.value()[ el.index() ] = val;
+						var value = $.extend([], item.value());
+
+						if( val ) {
+							//var value = item.value();
+							value[ el.index() ] = val;
+							item.value( value );
+							//item.value()[ el.index() ] = val;
+						}
+
+						return value[ el.index() ];
 					};
 				}.apply(el, [this]),
 				"generateSortButton": function() {
