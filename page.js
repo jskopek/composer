@@ -31,8 +31,8 @@ $(document).ready(function() {
 		"type": "fieldset",
 		"label": "Basic Info",
 		"value": [data, data2],
-		"collapsible": true,
-		"collapsed": true
+		"collapsible": false,
+		"collapsed": false
 	});
 
 	dataset.push({
@@ -48,8 +48,6 @@ $(document).ready(function() {
 		"type": "checkbox",
 		"value": true,
 		"label": "I agree to the terms of service",
-		"validation": ["not_empty", "longer_than"],
-		"longer_than" : 4,
 		"tooltip": "This is a test"
 	});
 
@@ -74,8 +72,6 @@ $(document).ready(function() {
 		},
 		"value": "premium",
 		//"label": "Choose your account type",
-		"validation": ["not_empty", "longer_than"],
-		"longer_than" : 400,
 		"tooltip": "This is a test"
 	});
     dataset.push({
@@ -219,6 +215,7 @@ $(document).ready(function() {
 
 	c = $("#form1 .form_container").composer();
 	c.add( dataset );
+	//c.get("username").hide();
 	c.bind("change", function() {
 		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
 	});

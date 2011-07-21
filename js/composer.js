@@ -47,6 +47,24 @@ var composerItem = Backbone.Model.extend({
 		});
 
 		if( this.get("value") ) { this.trigger("change:value"); }
+
+		//set up event handlers for 'hidden' property
+		this.bind("change:hidden", function() {
+			if( this.get("hidden") === true ) {
+				this.get("el").hide();
+			} else {
+				this.get("el").show();
+			}
+		});
+		if( this.get("hidden") ) {
+			this.trigger("change:hidden");
+		}
+	},
+	hide: function() {
+		this.set({"hidden": true});
+	},
+	show: function() {
+		this.set({"hidden": false});
 	},
 	get_widget: function() {
 		var widget = this.collection.widgets[this.get("type")];
@@ -56,6 +74,11 @@ var composerItem = Backbone.Model.extend({
 		return widget;
 	},
 	is_valid: function() {
+		//hidden items always pass validation (and don't return a value)
+		if( this.get("hidden") ) {
+			return true;
+		}
+		
 		//set up a list of validation types
 		var validation_types = [];
 		if( typeof this.get("validation") === "string" ) {
@@ -93,6 +116,11 @@ var composerItem = Backbone.Model.extend({
 		return true;
 	},
 	value: function(val) {
+		//hidden items don't return a value (because they don't have to pass validation)
+		if( this.get("hidden") ) {
+			return undefined;
+		}
+
 		if( val != undefined ) {
 			this.set({"value": val});
 		}
