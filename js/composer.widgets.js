@@ -502,39 +502,40 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 	}
 });
 
-$.fn.composerWidgets["radio"] = $.extend({}, $.fn.composerWidgets["text"], {
-	"initialize": function() {
-		$(this.get("el")).addClass("cClickInput");
+$.fn.composerWidgets["radio"] = $.fn.composerWidgetsGenerator(function(el) {
 
-		var html = '<ul>';
+		var html = '';
+
+		html += '<ul>';
 
 		var options = this.get("options");
 		var counter = 0;
 		for( var value in options ) {
 			var id = this.get("id") + "_" + counter; counter++;
 			html += "<li>";
-			html += "<div class='cInput'><input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'></div>";
-			html += "<div class='cLabel'><label for='" + id + "'>" + options[value] + "</label></div>";
+			html += "<input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'>";
+			html += "<label for='" + id + "'>" + options[value] + "</label>";
 			html += "</li>";
 		}
 		html += "</ul>";
 		
-		$(this.get("el")).html(html);
+		$(el).html(html);
 	
 		//bind for value change
 		var that = this;
-		$(this.get("el")).find("input").bind("click", function() {
+		$(el).find("input").bind("click", function() {
 			that.value( $(this).attr("value") );
 		});
 
-		//placeholder handler
-		$.fn.composerWidgets["text"].set_placeholder.apply(this);
-		$.fn.composerWidgets["text"].set_tooltip.apply(this);
-
+		//add inline class, if inline property specified
+		if( this.get("inline") ) {
+			$(el).addClass("cRadioInline");
+		}
 	},
-	"set_value": function( val ) {
-		$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("selected", true);
+	{
+		"set_value": function( val ) {
+			$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("checked", true);
+		}
 	}
-});
-
+);
 

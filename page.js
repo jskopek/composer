@@ -72,7 +72,8 @@ $(document).ready(function() {
 			"light": "Light - free",
 			"premium": "Premium - $40 / year"
 		},
-		"label": "Choose your account type",
+		"value": "premium",
+		//"label": "Choose your account type",
 		"validation": ["not_empty", "longer_than"],
 		"longer_than" : 400,
 		"tooltip": "This is a test"
