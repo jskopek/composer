@@ -191,6 +191,11 @@ $.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function(el) {
 $.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(
     function(el) {
         $(el).html("<textarea id='" + this.get("id") + "'></textarea>");
+
+        var item = this;
+        $(this.get("el")).find("textarea").bind("change", function() {
+            item.value( $(this).val() );
+        });
     },
     {
         "set_value": function( val ) {
@@ -331,9 +336,8 @@ $.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], 
 
 $.fn.composerWidgets["uploadify"] = $.extend({}, 
     $.fn.composerWidgetsGenerator(function(el) {
-        if (!this.get("options")) {
-            this.set({"options": []});
-        }
+		//options
+		var file_types = this.get("file_types") ? this.get("file_types") : "*";
 
         var html = "";
         if (this.get("label")) {
@@ -355,14 +359,43 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
             "success": function(data, args) {
                 args["scriptData"]["policy"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["policy"]));
                 args["scriptData"]["signature"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["signature"]));
+
+				var file_uploaded_fn = function(e, queueID, fileObj) {
+					// Construct absolute URL of the image
+					var loc = args["script"] + "/" + args["key"];
+					// Replace the ${filename} placeholder with the real filename
+					loc = loc.replace("${filename}", fileObj.name);
+
+					//modify the progress bar to show that we are waiting for the FileObj to be created
+					uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").html(" - attaching");
+					
+					// Create FileObj on server
+					publisher.send({
+						"module": "publisher",
+						"command": "add_uploaded_file",
+						"args": {
+							"location": loc,
+							"file_name": fileObj.name,
+							"size": fileObj.size
+						},
+						"success": function(data, args) {
+							uploadify_item.value(args.key);
+							uploadify_item.get("el").find(".cInput").append("<p>" + fileObj.name + "</p>");
+
+							//remove the progress bar
+							uploadify_item.get("el").find("#image_key" + queueID).addClass("uploadifyUploaded");
+						}
+					});
+				};
+
                 var uploadify_args = $.extend(args, {
                     // Uploadify properties
                     "uploader": site_data.settings.MEDIA_URL + "uploadify.swf",
                     "buttonImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_upload.png",
                     "cancelImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_cancel.png",
                     "auto": true,
-                    "fileExt": "*.bmp;*.jpeg;*.jpg;*.png;*.gif;*.tiff",
-                    "fileDesc": "*.bmp;*.jpeg;*.jpg;*.png;*.gif;*.tiff",
+                    "fileExt": file_types,
+                    "fileDesc": file_types,
                     "buttonText": "Upload",
                     "multi": false,
                     "width": 71,
@@ -372,47 +405,22 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
                     },
                     "onError": function(e, queueID, fileObj, errorObj) {
                         if (errorObj.type === "File Size") {
-							var x; //pass js lint
-
+							var remaining_mb = Math.round(errorObj.info / 10485.76) / 100;
+							uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").after(" (" + remaining_mb + "MB remaining in course)");
                         } else if (errorObj.info === 201) {
                             // Flash for OS X treats 201 success messages as errors.
-                            fileUploaded(e, queueID, fileObj);
+                            file_uploaded_fn(e, queueID, fileObj);
                         }
                     },
-                    "onComplete": function(e, queueID, fileObj) {
-                        // Construct absolute URL of the image
-                        var location = args["script"] + "/" + args["key"];
-                        // Replace the ${filename} placeholder with the real filename
-                        location = location.replace("${filename}", fileObj.name);
-
-                        // TODO: progressbar
-
-                        // Create FileObj on server
-                        publisher.send({
-                            "module": "publisher",
-                            "command": "add_uploaded_file",
-                            "args": {
-                                "location": location,
-                                "file_name": fileObj.name,
-                                "size": fileObj.size
-                            },
-                            "success": function(data, args) {
-                                // FileObj has been created 
-                                uploadify_item.value(fileObj.name);
-                            }
-                        });
-                    }
-                });
+                    "onComplete": file_uploaded_fn
+				});
 
                 $(uploadify_item.get("el")).find("input#" + uploadify_item.get("id")).uploadify(uploadify_args);
             }
         });
     }),
     {
-        "set_value": function(value) {
-            // TODO
-            this.get("el").find(".cInput").append("<p>" + value + "</p>");
-        }
+        "set_value": function(value) {} //uploadify cannot be set to existing value
     }
 );
 
