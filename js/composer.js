@@ -162,7 +162,13 @@ var composerCollection = Backbone.Collection.extend({
                     //return dictionary of values
 					var values = {};
 					collection.each(function(item) {
+						//check to see if the item is in a list of types to be excluded from exporting
+						if( _.include(["fieldset"], item.get("type")) ) {
+							return true;
+						}
+
 						values[ item.get("id") ] = item.value();
+						return true;
 					});
 					return values;
 				},
