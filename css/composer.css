@@ -140,31 +140,28 @@
 .cRow input[type=radio] {
 	margin-right: 14px;
 }
-/*.cRow.cType_radio ul {
-	margin: 0;
-	padding: 0;
+
+.cRow.cType_radio .cInput ul li {
+	display: table;
+	width: 100%;
 }
-.cRow.cType_radio > .cLabel label {
-	margin: 5px;
-	margin-left: 0px;
-	font-weight: normal;
+.cRow.cType_radio .cInput ul li .cRadioInput,
+.cRow.cType_radio .cInput ul li .cRadioLabel {
+	display: table-cell;
+	vertical-align: middle;
 }
-.cRow.cType_radio ul li label {
-	padding: 4px 0;
-}*/
-.cRow.cType_radio ul {
-	margin: 0;
-	padding: 0;
+.cRow.cType_radio .cInput ul li .cRadioLabel label {
+	display: block;
+	cursor: pointer;
 }
-.cRow.cType_radio .cInput ul li input {
-	width: auto;
-	margin-right: 8px;
+.cRow.cType_radio .cInput ul li .cRadioInput {
+	width: 28px;
 }
-.cRow.cType_radio ul li label {
-}
+
 .cRow.cType_radio .cInput.cRadioInline ul li {
 	float: left;
 	margin-right: 30px;
+	width: auto;
 }
 /* placeholder */
 .cRow .cInput .cPlaceholder {

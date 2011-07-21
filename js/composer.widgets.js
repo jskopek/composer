@@ -513,8 +513,8 @@ $.fn.composerWidgets["radio"] = $.fn.composerWidgetsGenerator(function(el) {
 		for( var value in options ) {
 			var id = this.get("id") + "_" + counter; counter++;
 			html += "<li>";
-			html += "<input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'>";
-			html += "<label for='" + id + "'>" + options[value] + "</label>";
+			html += "<div class='cRadioInput'><input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'></div>";
+			html += "<div class='cRadioLabel'><label for='" + id + "'>" + options[value] + "</label></div>";
 			html += "</li>";
 		}
 		html += "</ul>";
@@ -534,7 +534,12 @@ $.fn.composerWidgets["radio"] = $.fn.composerWidgetsGenerator(function(el) {
 	},
 	{
 		"set_value": function( val ) {
-			$(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; }).attr("checked", true);
+			var matched_radio = $(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; });
+            matched_radio.attr("checked", true);
+
+            //mark as selected
+            matched_radio.parents("li").siblings().removeClass("cRadioSelected");
+            matched_radio.parents("li").addClass("cRadioSelected");
 		}
 	}
 );
