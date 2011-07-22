@@ -213,6 +213,12 @@ $(document).ready(function() {
 		"sortable": true
 	});
 
+    dataset.push({
+        "id": "fset",
+        "type": "fieldset",
+        "label": "FIELD SETTTTT"
+    });
+
 	c = $("#form1 .form_container").composer();
 	c.add( dataset );
 	//c.get("username").hide();

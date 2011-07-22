@@ -433,11 +433,6 @@ $.fn.composerWidgets["fieldset"] = {
 	"initialize": function() {
 		this.get("el").html("<fieldset id='cId_" + this.get("id") + "'><legend>" + this.get("label") + "</legend><div class='cFieldsetData'></div></fieldset>");
 
-		var value = $.extend([], this.value() );
-		for( var index in value ) {
-			value[index]["container_el"] = this.get("el").find(".cFieldsetData");
-		}
-
 
 		if( this.get("collapsible") ) {
 			this.get("el").addClass("cCollapsible");
@@ -466,9 +461,14 @@ $.fn.composerWidgets["fieldset"] = {
 				item.set({ "collapsed": !item.get("collapsed") });
 			});
 		}
-		
+	},
+    "set_value": function(value) {
+		var val = $.extend([], value);
+		for( var index in val ) {
+			val[index]["container_el"] = this.get("el").find(".cFieldsetData");
+		}
 		this.collection.add( value );
-	}
+    }
 };
 
 $.fn.composerWidgets["hidden"] = {
