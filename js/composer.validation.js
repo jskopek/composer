@@ -93,7 +93,15 @@ $.fn.composerValidation["not_empty"] = function(item_val) {
 		//{0: "value 1", 1: "value 2"} == :), {0: "value 1"} == :), {0: "   "} == :(, {} == :(
 
 		//loop through items and return list with true/false based on if they have empty values
-		var results = _.map(item_val, function(item) { return item.trim() === ""; });
+		var results = _.map(item_val, function(item) {
+            if( typeof(item_val) == "string" ) {
+                return item.trim() === "";
+            } else if( typeof(item_val) !== "undefined" ) {
+                return false;
+            } else {
+                return true;
+            }
+        });
 		if( results.length > 0 && !_.include(results, true) ) {
 			valid = true;
 		}
