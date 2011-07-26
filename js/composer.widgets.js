@@ -379,7 +379,7 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
 							"size": fileObj.size
 						},
 						"success": function(data, args) {
-							uploadify_item.value(args.key);
+							uploadify_item.value([fileObj.name, args.key]);
 							uploadify_item.get("el").find(".cInput").append("<p>" + fileObj.name + "</p>");
 
 							//remove the progress bar
@@ -433,12 +433,6 @@ $.fn.composerWidgets["fieldset"] = {
 	"initialize": function() {
 		this.get("el").html("<fieldset id='cId_" + this.get("id") + "'><legend>" + this.get("label") + "</legend><div class='cFieldsetData'></div></fieldset>");
 
-		var value = $.extend([], this.value() );
-		for( var index in value ) {
-			value[index]["container_el"] = this.get("el").find(".cFieldsetData");
-		}
-
-
 		if( this.get("collapsible") ) {
 			this.get("el").addClass("cCollapsible");
 
@@ -466,9 +460,14 @@ $.fn.composerWidgets["fieldset"] = {
 				item.set({ "collapsed": !item.get("collapsed") });
 			});
 		}
-		
+	},
+    "set_value": function(value) {
+		var val = $.extend([], value);
+		for( var index in val ) {
+			val[index]["container_el"] = this.get("el").find(".cFieldsetData");
+		}
 		this.collection.add( value );
-	}
+    }
 };
 
 $.fn.composerWidgets["hidden"] = {
@@ -488,7 +487,7 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		$(this.get("el")).addClass("cClickInput");
 
 		var html = '';
-		html += "<div class='cInput'><input type='checkbox' id='" + this.get("id") + "' value='" + this.get("value") + "'></div>";
+		html += "<div class='cInput'><input type='checkbox' id='" + this.get("id") + "'></div>";
 		if( this.get("label") ) {
 			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
 		}
@@ -499,6 +498,11 @@ $.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
 		$(this.get("el")).find("input").bind("click", function() {
 			that.value( $(this).is(":checked") );
 		});
+
+		//explicitely set value to false if undefined
+		if( this.value() == undefined ) {
+			this.value(false);
+		}
 
 		//placeholder handler
 		$.fn.composerWidgets["text"].set_placeholder.apply(this);
