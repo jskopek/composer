@@ -176,7 +176,7 @@ var composerCollection = Backbone.Collection.extend({
 					});
 					return is_valid;
 				},
-				"values": function( val ) {
+				"values": function( val, default_to_placeholder ) {
                     //if dictionary of new values is passed, update the items
                     if( val ) {
                         collection.each(function(item) {
@@ -195,10 +195,18 @@ var composerCollection = Backbone.Collection.extend({
 							return true;
 						}
 
-						values[ item.get("id") ] = item.value();
+						var item_value = item.value();
+						if( !item_value && default_to_placeholder ) {
+							item_value = item.get("placeholder");
+						}
+						values[ item.get("id") ] = item_value;
 						return true;
 					});
 					return values;
+				},
+				//shortcut to get values or placeholders
+				"values_or_placeholders": function() {
+                    return this.values(undefined,true);
 				},
 				"items": function() {
 					return collection.models;
@@ -207,6 +215,7 @@ var composerCollection = Backbone.Collection.extend({
 					collection.bind( evt, fn );
 				}
 			};
+			collection.el.addClass("cForm").data("cForm", methods);
 			return methods;
 		}
 	});	
