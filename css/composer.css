@@ -1,3 +1,6 @@
+/* @override http://localhost:8000/media/css/edumacation/composer.css */
+
+
 /* style 1 */
 /*body {
 	font-size: 12px;
@@ -183,6 +186,10 @@
 	right: 25px;
 	cursor: pointer;
 }
+.cRow .cType_set .cValidation {
+	top: 0;
+	margin-top: 18px;
+}
 .cRow .cValidation.valid {
 	display: block;
 	background: url(composer_images/symbol_check.gif);	
@@ -305,4 +312,12 @@
 }
 .cType_fieldset.cCollapsible.cCollapsed .cFieldsetData {
 	display: none;
+}
+/* a little hack to make sortable widgets a little easier to move; this adds extra spacing
+to the top and bottom of the sort list to give room for a dragged item to move over an existing item
+adding padding to the element doesn't work with the jquery ui sortable plugin */
+.cType_set .cSetWrapper.ui-sortable:before,
+.cType_set .cSetWrapper.ui-sortable:after {
+	content: "&nbsp;";
+	opacity: 0;
 }
