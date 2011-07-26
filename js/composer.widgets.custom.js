@@ -14,7 +14,9 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		}
 		html += "<div class='cInput'>";
 			html += this.get("set_wrapper");
-			html += "<a href='#' class='cButton add'>Add</a>";
+            if (!this.get("immutable")) {
+                html += "<a href='#' class='cButton add'>Add</a>";
+            }
 		html += "</div>";
 		$(this.get("el")).html(html);
 
@@ -24,6 +26,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 				"axis": "y",
 				"handle": ".cSortHandle",
 				"containment": "parent",
+				"helper": 'clone',
 				"start": function(evt, ui) {
 					//http://css.dzone.com/articles/keeping-track-indexes-while
 					ui.item.data("originIndex", ui.item.index());
@@ -52,10 +55,12 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			val.push("");
 			item.value( val );
 
+			//trigger the add event
+			var new_el = item.get("el").find("li:last");
 			if( item.get("add") ) {
-				item.get("add").apply(this, [item.get("el").find("li:last")]);
+				item.get("add").apply(item, [new_el]);
 			}
-
+			item.trigger("add", new_el);
 		});
 
 		//placeholder handler
@@ -77,6 +82,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		//we do this seperately because the structure functions may modify the value,
 		//which causes a recursive loop
 		for( index in val ) {
+			index = parseInt(index, 10);
 			el = this.get("el").find(".cSetWrapper .cSetItem:eq(" + index + ")");
 			
 
@@ -90,7 +96,7 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 					return function(val) {
 						var value = $.extend([], item.value());
 
-						if( val ) {
+						if( val !== undefined) {
 							//var value = item.value();
 							value[ el.index() ] = val;
 							item.value( value );
@@ -123,14 +129,16 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			e.preventDefault();
 
 			var index = $(this).parents(".cSetItem").index();
-
-			var index_el = item.get("el").find(".cSetItem:eq(" + index + ")");
-			if( item.get("delete") ) {
-				item.get("delete").apply(this, [index_el]);
-			}
-
 			var val = $.extend([],item.value());
-			val.splice(index, 1);
+			var removed_value = val.splice(index, 1);
+
+			//trigger delete event
+			if( item.get("delete") ) {
+				item.get("delete").apply(item, [index, removed_value[0]]);
+			}
+			item.trigger("delete", index, removed_value[0]);
+
+			//update the item's value list without the removed value
 			item.value( val );
 		});
 	}
