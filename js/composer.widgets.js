@@ -141,23 +141,42 @@ $.fn.composerWidgetsGenerator = function(input_html_generator_fn, extend_fn_dict
 			if( !this.get("placeholder") ) { 
 				return false; 
 			}
-			this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
-			$(this.get("el")).find(".cPlaceholder").click(function() {
-				$(this).siblings("input").add( $(this).siblings("textarea") ).focus();
-			});
-			if( this.value() ) {
-				$(this.get("el")).find(".cPlaceholder").hide();
+
+			//get the instances of 'input' and 'textarea' form elements
+			var form_els = $(this.get("el")).find("input").add( $(this.get("el")).find("textarea") );
+
+			//determine if the browser supports the native 'placeholder' property
+			var input = document.createElement("input");
+			var placeholder_support = 'placeholder' in input;
+
+			if( placeholder_support ) {
+				//easy, better approach
+				form_els.attr("placeholder", this.get("placeholder")); 
+			} else {
+				//otherwise, fake it
+				this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
+
+				//hide the placeholder if there is a value
+				if( this.value() ) {
+					$(this.get("el")).find(".cPlaceholder").hide();
+				}
+
+				//re-run the set_placholder command on value change (e.g. a form element's value changed programmatically)
+				var item = this;
+				this.bind("change:value", function() {
+					item.get_widget().set_placeholder.apply(this);
+				});
+
+				//hide and show placeholder on click
+				form_els.add( $(this.get("el")).find(".cPlaceholder") ).click(function() {
+					$(item.get("el")).find(".cPlaceholder").hide();
+					form_els.focus();
+				});
+				form_els.bind("blur", function() {
+					$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
+				});
 			}
 
-			//re-run the set_placholder command on value change (e.g. a form element's value changed programmatically)
-			var item = this;
-			this.bind("change:value", function() {
-				item.get_widget().set_placeholder.apply(this);
-			});
-
-			$(this.get("el")).find("input").add( $(this.get("el")).find("textarea") ).bind("keyup", function() {
-				$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
-			});
 			return true;
 		},
 		"set_validation_message": function(msg) {
@@ -262,6 +281,7 @@ $.fn.composerWidgets["picker"] = $.extend({},
 		this.bind("change:index", function() {
 			var value = item.get("options")[ item.get("index") ];
 			item.get("el").find(".cPicker").html( value );
+			item.value( value );
 		});
 		if( !this.get("index") ) {
 			this.set({"index": 0});
@@ -350,6 +370,7 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
         html += "</div>";
 
         $(this.get("el")).html(html);
+		$(this.get("el")).find(".cInput").addClass("uploadifyLoading");
 
         var uploadify_item = this;
         publisher.send({
@@ -379,7 +400,7 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
 							"size": fileObj.size
 						},
 						"success": function(data, args) {
-							uploadify_item.value([fileObj.name, args.key]);
+							uploadify_item.value([fileObj.name, args.key, loc] );
 							uploadify_item.get("el").find(".cInput").append("<p>" + fileObj.name + "</p>");
 
 							//remove the progress bar
@@ -400,6 +421,9 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
                     "multi": false,
                     "width": 71,
                     "height": 20,
+					"onInit": function(e, d) {
+						$(uploadify_item.get("el")).find(".cInput").removeClass("uploadifyLoading");
+					},
                     "onSelectOnce": function(e, d) {
                         // TODO
                     },
