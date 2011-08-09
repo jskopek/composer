@@ -86,7 +86,8 @@ $.fn.composerValidation["not_empty"] = function(item_val) {
 	var valid = false;
 	if( typeof(item_val) == "string" ) {
 		//"value" == :), "    " == :(, "" == :(
-		if( item_val.trim() !== "" ) {
+		//if( item_val.trim() !== "" ) {
+        if( $.trim(item_val) !== "" ) {
 			valid = true;
 		}
 	} else if( typeof(item_val) == "object" ) {
@@ -94,9 +95,23 @@ $.fn.composerValidation["not_empty"] = function(item_val) {
 
 		//loop through items and return list with true/false based on if they have empty values
 		var results = _.map(item_val, function(item) {
-            if( typeof(item_val) == "string" ) {
-                return item.trim() === "";
-            } else if( typeof(item_val) !== "undefined" ) {
+            if( typeof(item) === "string" ) {
+                //return item.trim() === "";
+                return $.trim(item) === "";
+            } else if (typeof(item) === "object") {
+                if ($.isEmptyObject(item)) {
+                    return true;
+                } else {
+                    var recurse = $.fn.composerValidation["not_empty"](item);
+                    if (typeof recurse === "string") {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } else if (typeof (item) === "boolean") {
+                return false; 
+            } else if( typeof(item) !== "undefined" ) {
                 return false;
             } else {
                 return true;
@@ -105,7 +120,9 @@ $.fn.composerValidation["not_empty"] = function(item_val) {
 		if( results.length > 0 && !_.include(results, true) ) {
 			valid = true;
 		}
-	}
+	} else if (typeof (item_val) == "number") {
+        valid = true;
+    }
 	
 	if( !valid ) {
 		return 'Value must not be empty';
