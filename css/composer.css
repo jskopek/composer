@@ -1,5 +1,7 @@
 /* @override http://127.0.0.1:8000/media/css/edumacation/composer.css */
 
+/* @override http://127.0.0.1:8000/media/css/edumacation/composer.css */
+
 .cRow {
 	background: #f6f6f6;
 	margin-bottom: 12px;
@@ -298,14 +300,19 @@ adding padding to the element doesn't work with the jquery ui sortable plugin */
 	width: auto !important;
 }
 .cRow .cType_uploadify .cInput {
-	width: 100px !important;
+	width: 70px !important;
 	display: table-cell;
-	text-align: center;
+	text-align: left;
 }
-.uploadifyLoading {
-	background-image: url(../../images/edumacation/buttons/button_upload_inactive.png);
-	background-repeat: no-repeat;
-	background-position: top left;
-	text-indent: -3000px;
+.cRow .cType_uploadify .cInput object {
+	z-index: 11;
+	position: relative;
 }
-
+.cRow .cType_uploadify .cInput .loadingMsg {
+	z-index: 10;
+	position: absolute; top: 0; left: 0;
+	color: #aaa; background-color: #fff;
+	border: 1px solid #aaa; border-radius: 7px;
+	width: 60px; overflow: hidden;
+	line-height: 17px; text-align: center; font-size: 11px;
+}

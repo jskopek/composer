@@ -366,11 +366,14 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
         }
 
         html += "<div class='cInput'>";
+		//loadingMsg must appear behind the input, so it is asbsolute; we need a position: relative object, and we can't use cInput because it is display:table-cell
+		html += "<div style='position:relative'>"; 
         html += "<input id='" + this.get("id") + "' type='file_upload' />";
+		html += "<div class='loadingMsg'>Loading</div>";
+		html += "</div>";
         html += "</div>";
 
         $(this.get("el")).html(html);
-		$(this.get("el")).find(".cInput").addClass("uploadifyLoading");
 
         var uploadify_item = this;
         publisher.send({
@@ -421,9 +424,6 @@ $.fn.composerWidgets["uploadify"] = $.extend({},
                     "multi": false,
                     "width": 71,
                     "height": 20,
-					"onInit": function(e, d) {
-						$(uploadify_item.get("el")).find(".cInput").removeClass("uploadifyLoading");
-					},
                     "onSelectOnce": function(e, d) {
                         // TODO
                     },
