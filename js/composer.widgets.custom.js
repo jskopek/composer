@@ -1,4 +1,22 @@
 var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
+	"refresh": function() {
+		this.trigger("change:value");
+	},
+	"bind_new_row_on_enter": function(form_item, el, new_val) {
+		//convenience function to ease process of adding new item to set on enter key press
+		$(el).bind("keydown", function(e) {
+			if( e.keyCode == 13 ) {
+				$(this).blur(); //forces a 'change' event before the data is re-calculated
+
+				//extend the set
+				var val = $.extend([], form_item.value());
+				val.push(new_val);
+				form_item.value( val );
+
+				form_item.get("el").find("input[type='text']:last").focus();
+			}
+		});
+	},
 	"initialize": function() {
 
 		//initialize value, if it is not passed in
@@ -20,32 +38,43 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 		html += "</div>";
 		$(this.get("el")).html(html);
 
-		var that = this;
-		if( this.get("sortable") && $.fn.sortable ) {
-			$(this.get("el")).find(".cSetWrapper").sortable({
-				"axis": "y",
-				"handle": ".cSortHandle",
-				"containment": "parent",
-				"helper": 'clone',
-				"start": function(evt, ui) {
-					//http://css.dzone.com/articles/keeping-track-indexes-while
-					ui.item.data("originIndex", ui.item.index());
-				},
-				"stop": function(evt, ui) {
-					var value = $.extend([], that.value());
-					var originIndex = ui.item.data("originIndex");
-					var currentIndex = ui.item.index();
 
-					//remove the value from the origin index
-					var originValue = value.splice(originIndex, 1);
+        //set up sorting event helper - this is used by click and drag sorting events
+        this.changeSortValue = function(originIndex, currentIndex) {
+            var value = $.extend([], this.value());
+            if( currentIndex < 0 ) { return false; }
+            if( currentIndex > (value.length - 1) ) { return false; }
 
-					//insert the value at the new index
-					value.splice(currentIndex, 0, originValue[0]);
-	
-					that.value( value );
-				}
-			});
-		}
+            //remove the value from the origin index
+            var originValue = value.splice(originIndex, 1);
+
+            //insert the value at the new index
+            value.splice(currentIndex, 0, originValue[0]);
+
+            this.value( value );
+			return true;
+        };
+
+        //if conditions are perfect, add drag sorting
+		if( this.get("sortable") && $.fn.sortable && !this.get("clickSort") ) {
+            var that = this;
+            $(this.get("el")).find(".cSetWrapper").sortable({
+                "axis": "y",
+                "handle": ".cSortHandle",
+                "containment": "parent",
+                "helper": 'clone',
+                "start": function(evt, ui) {
+                    //http://css.dzone.com/articles/keeping-track-indexes-while
+                    ui.item.data("originIndex", ui.item.index());
+                },
+                "stop": function(evt, ui) {
+
+                    var originIndex = ui.item.data("originIndex");
+                    var currentIndex = ui.item.index();
+                    that.changeSortValue(originIndex, currentIndex);
+                }
+            });
+        }
 
 		//bind for value change
 		var item = this;
@@ -107,10 +136,12 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 					};
 				}.apply(el, [this]),
 				"generateSortButton": function() {
-					if( item.get("sortable") && $.fn.sortable ) {
-						return "<span class='cSortHandle'>|||</span>";
-					} else {
-						return "";
+					if( !item.get("sortable") ) {
+                        return "";
+                    } else if( $.fn.sortable && !item.get("clickSort") ) {
+                        return "<span class='cSortHandle'>|||</span>";
+                    } else {
+                        return "<span class='cClickSort'><a href='#' class='cButton cClickSortUp'>&#x25b2;</a><a href='#' class='cButton cClickSortDown'>&#x25bc;</a></span>";
 					}
 				},
 				"generateDeleteButton": function() {
@@ -141,6 +172,14 @@ var custom_generic_widget = $.extend({}, $.fn.composerWidgets["text"], {
 			//update the item's value list without the removed value
 			item.value( val );
 		});
+
+        this.get("el").find(".cClickSort a").bind("click", function(e) {
+            e.preventDefault();
+            var originIndex = $(this).parents(".cSetItem").index();
+            var diff = $(this).hasClass("cClickSortDown") ? 1 : -1;
+            var currentIndex = originIndex + diff;
+            item.changeSortValue(originIndex, currentIndex);
+        });
 	}
 });
 
