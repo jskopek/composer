@@ -1,55 +1,5 @@
-/* @override http://localhost:8000/media/css/edumacation/composer.css */
+/* @override http://127.0.0.1:8000/media/css/edumacation/composer.css */
 
-
-/* style 1 */
-/*body {
-	font-size: 12px;
-}
-.c_rowWW input[type=checkbox] {
-	margin-right: 14px;
-}
-.c_row input[type=radio] {
-	margin-right: 14px;
-}
-.c_row.c_type_radio ul {
-	margin: 0;
-	padding: 0;
-}
-.c_row.c_type_radio ul li {
-	list-style: none;
-}
-.c_row.c_type_radio ul li label {
-	padding: 4px 0;
-}
-
-.c_row label {
-	color: #4d4d4d;
-	font-weight: bold;
-	text-shadow: 0px 1px 1px #fff;
-	padding: 8px 0;
-	display: inline-block;
-}
-.c_row input {
-	margin: 0;
-	padding: 8px 14px;
-	font-size: 1em;
-	border-radius: 3px;	
-}
-.c_row .error {
-	display: none;
-}
-	
-.c_row.c_text_input label {
-	float: left;
-	width: 30%;	
-}
-.c_row.c_text_input input {
-	width: 60%;	
-	display: block;	
-}*/
-
-.form_container {
-}
 .cRow {
 	background: #f6f6f6;
 	margin-bottom: 12px;
@@ -75,6 +25,9 @@
 	width: 20%;
 }
 .cRow.cTextInput .cInput {
+	width: 100%;
+}
+.cRow.cTextInput .cLabel + .cInput {
 	width: 80%;
 }
 .cRow.cClickInput .cLabel {
@@ -124,15 +77,30 @@
 	-moz-box-shadow: 0px 0px 2px #000;
 }
 
-.cRow .cSortHandle {
+.cRow.cType_set .cSortHandle {
 	color: #aaa;
 	margin-right: 7px;
 	text-shadow: 1px 1px 1px #e4f4fa;
 	cursor: move;
 }
-.cRow .cSortHandle:hover {
+.cRow.cType_set .cSortHandle:hover {
 	color: #0b3852;
 }
+.cRow.cType_set .cClickSort a {
+	font-size: 13px;
+	padding: 6px 8px;
+}
+.cRow.cType_set .cClickSortUp {
+	-webkit-border-radius: 4px 0 0 4px;
+	-moz-border-radius: 4px 0 0 4px;
+	border-radius: 4px 0 0 4px;
+}
+.cRow.cType_set .cClickSortDown {
+	-webkit-border-radius: 0 4px 4px 0;
+	-moz-border-radius: 0 4px 4px 0;
+	border-radius: 0 4px 4px 0;
+}
+
 .cRow .cInput textarea {
 	height: 80px;
 }
@@ -321,3 +289,23 @@ adding padding to the element doesn't work with the jquery ui sortable plugin */
 	content: "&nbsp;";
 	opacity: 0;
 }
+.cRow .cType_uploadify {
+	display: table;
+	width: 100%;
+}
+.cRow .cType_uploadify .cLabel  {
+	display: table-cell;
+	width: auto !important;
+}
+.cRow .cType_uploadify .cInput {
+	width: 100px !important;
+	display: table-cell;
+	text-align: center;
+}
+.uploadifyLoading {
+	background-image: url(../../images/edumacation/buttons/button_upload_inactive.png);
+	background-repeat: no-repeat;
+	background-position: top left;
+	text-indent: -3000px;
+}
+
