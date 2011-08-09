@@ -1,4 +1,7 @@
 var composerItem = Backbone.Model.extend({
+	remove: function() {
+		this.collection.remove(this);
+	},
 	initialize: function() {
 		if( !this.get("id") && !this.get("type") ) {
 			throw("Missing `id` or `type` properties!");
@@ -18,10 +21,6 @@ var composerItem = Backbone.Model.extend({
 
 		var widget = this.get_widget();
 		widget.initialize.apply(this);
-
-		if( this.get("value") ) {
-			this.value( this.get("value") );
-		}
 
 		//trigger validation on item value change
 		this.bind("change:value", function() {
@@ -59,9 +58,39 @@ var composerItem = Backbone.Model.extend({
 		if( this.get("hidden") ) {
 			this.trigger("change:hidden");
 		}
+
+        //run initialize function, if it is defined
+        if( this.get("initialize") ) {
+            this.get("initialize").apply(this);
+        }
+        this.bind("change:value", function() {
+            if( this.get("change") ) {
+                this.get("change").apply(this);
+            }
+        });
+
+		this.bind("change:class", function() {
+			this.get("el").addClass( this.get("class") );
+		});
+		if( this.get("class") ) { 
+			this.trigger("change:class"); 
+		}
+
+        if( this.get("value") != undefined ) {
+			this.value( this.get("value") );
+		}
 	},
-	hide: function() {
+	refresh: function() {
+		var widget = this.get_widget();
+		if( widget["refresh"] ) {
+			widget.refresh.apply(this);
+		}
+	},
+	hide: function(show_value_while_hidden) {
 		this.set({"hidden": true});
+		if( show_value_while_hidden ) {
+			this.set({"show_value_while_hidden": true});
+		}
 	},
 	show: function() {
 		this.set({"hidden": false});
@@ -117,12 +146,16 @@ var composerItem = Backbone.Model.extend({
 	},
 	value: function(val) {
 		//hidden items don't return a value (because they don't have to pass validation)
-		if( this.get("hidden") ) {
+		if( this.get("hidden") && !this.get("show_value_while_hidden") ) {
 			return undefined;
 		}
 
 		if( val != undefined ) {
 			this.set({"value": val});
+
+            if( this.get("set") ) {
+                this.get("set").apply(this);
+            }
 		}
 
 		return this.get("value");
@@ -151,6 +184,9 @@ var composerCollection = Backbone.Collection.extend({
 			}
 
 			var methods = {
+				"get_id": function() {
+					return $(collection.el).attr("id");
+				},
 				"get": function(id) {
 					return collection.get(id);
 				},
@@ -181,7 +217,7 @@ var composerCollection = Backbone.Collection.extend({
                     if( val ) {
                         collection.each(function(item) {
                             var new_item_val = val[ item.get("id") ];
-                            if( new_item_val ) {
+                            if( new_item_val !== undefined ) {
                                 item.value( new_item_val );
                             }
                         });
@@ -196,7 +232,7 @@ var composerCollection = Backbone.Collection.extend({
 						}
 
 						var item_value = item.value();
-						if( !item_value && default_to_placeholder ) {
+						if( (item_value === undefined || item_value === "" || item_value === [] || item_value === {}) && default_to_placeholder ) {
 							item_value = item.get("placeholder");
 						}
 						values[ item.get("id") ] = item_value;
