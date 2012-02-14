@@ -1,3 +1,538 @@
+//GENERATOR FUNCTION - MAKES IT EASY TO BULID SIMPLE FORM ELEMENTS
+var Widget = Backbone.View.extend({
+    tagName: "div",
+    className: "cRow cTextInput",
+
+    "events": {
+        ".cRow click": "click",
+    },
+    "click": function() { this.model.trigger("click"); },
+    "initialize": function() {
+        $(this.el).addClass("cType_" + this.model.get("type"));
+        $(this.el).attr("cId_" + this.model.get("id"));
+
+
+        this.model.bind("change:value", this.render_form_el_value, this);
+
+		this.model.bind("remove", function() {
+			$(this.el).remove();
+		});
+
+        //hide or show item
+		this.model.bind("change:hidden", this.update_hidden, this);
+        this.update_hidden();
+
+        //update class
+		this.bind("change:class", this.update_class, this);
+        this.update_class();
+
+        //show/hide validation message
+        this.model.bind("change:validation_msg", this.render_validation_message, this);
+        this.render_validation_msg();
+
+        this.render();
+    },
+    "render": function() {
+        var html = '';
+        if( this.model.get("label") ) {
+            html += "<div class='cLabel'><label for='" + this.model.get("id") + "'>" + this.model.get("label") + "</label></div>";
+        }
+        html += "<div class='cInput'></div>";
+        $(this.el).html(html);
+
+        this.render_form_el( $(this.el).find(".cInput") );
+        this.render_form_el_value();
+        
+        /*//TODO*/
+        /*//bind for value change*/
+        /*var item = this;*/
+        /*$(this.get("el")).find("input").bind("change", function() {*/
+        /*item.value( $(this).val() );*/
+        /*});*/
+
+        /*//placeholder handler*/
+        /*this.get_widget().set_placeholder.apply(this);*/
+        /*this.get_widget().set_tooltip.apply(this);*/
+    },
+    "render_form_el": function(el) {},
+    "update_class": function() {
+        $(this.el).addClass( this.model.get("class") );
+    },
+    "update_hidden": function() {
+        if( this.model.get("hidden") === true ) {
+            $(this.el).hide();
+        } else {
+            $(this.el).show();
+        }
+    },
+    "render_validation_msg": function() {
+        $(this.el).find(".cValidation").remove();
+
+        var msg = this.model.get("validation_msg");
+        if( msg ) {
+            $(this.el).append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
+        }
+    },
+    "render_form_el_value": function() {
+        $(this.el).find("input").val( this.model.get("value") );
+
+    },
+
+
+    //old
+    "generator": function(el) {},
+    "set_tooltip": function() {
+        if( this.get("tooltip") ) {
+            this.get("el").find(".cLabel:first").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
+        }
+    },
+    "set_placeholder": function() {
+        if( !this.get("placeholder") ) { 
+            return false; 
+        }
+
+        //get the instances of 'input' and 'textarea' form elements
+        var form_els = $(this.get("el")).find("input").add( $(this.get("el")).find("textarea") );
+
+        //determine if the browser supports the native 'placeholder' property
+        var input = document.createElement("input");
+        var placeholder_support = 'placeholder' in input;
+
+        if( placeholder_support ) {
+            //easy, better approach
+            form_els.attr("placeholder", this.get("placeholder")); 
+        } else {
+            //otherwise, fake it
+            this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
+
+            //hide the placeholder if there is a value
+            if( this.value() ) {
+                $(this.get("el")).find(".cPlaceholder").hide();
+            }
+
+            //re-run the set_placholder command on value change (e.g. a form element's value changed programmatically)
+            var item = this;
+            this.bind("change:value", function() {
+                item.get_widget().set_placeholder.apply(this);
+            });
+
+            //hide and show placeholder on click
+            form_els.add( $(this.get("el")).find(".cPlaceholder") ).click(function() {
+                $(item.get("el")).find(".cPlaceholder").hide();
+                form_els.focus();
+            });
+            form_els.bind("blur", function() {
+                $(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
+            });
+        }
+
+        return true;
+    },
+});
+
+
+//GENERIC WIDGETS
+var TextWidget = Widget.extend({
+    "render_form_el": function(el) {
+        var form_el = $("<input type='text' id='" + this.model.get("id") + "'>");
+
+        //update model value when form changes
+        $(form_el).bind("change", { "model": this.model }, function(e) { 
+            e.data.model.set({ "value":  $(this).val() }); 
+        });
+
+        if( this.model.get("number") && $.fn.numeric ) {
+            $(form_el).numeric({ allow: "-." });
+        }
+
+        $(el).html( form_el );
+    }
+});
+$.fn.composerWidgets["text"] = TextWidget;
+
+var PasswordWidget = Widget.extend({
+    "render_form_el": function(el) {
+        $(el).html("<input type='password' id='" + this.model.get("id") + "'>");
+    }
+});
+$.fn.composerWidgets["password"] = PasswordWidget;
+
+/*$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(*/
+/*function(el) {*/
+/*$(el).html("<textarea id='" + this.get("id") + "'></textarea>");*/
+
+/*var item = this;*/
+/*$(this.get("el")).find("textarea").bind("change", function() {*/
+/*item.value( $(this).val() );*/
+/*});*/
+/*},*/
+/*{*/
+/*"render_form_el_value": function( val ) {*/
+/*$(this.get("el")).find("textarea").val( val );*/
+/*}*/
+/*}*/
+/*);*/
+
+/*$.fn.composerWidgets["select"] = $.extend(*/
+/*{}, */
+/*$.fn.composerWidgetsGenerator(function() {*/
+/*var html = "<select id='" + this.get("id") + "'>";*/
+/*var options = this.get("options");*/
+
+/*var counter = 0;*/
+/*for (var value in options) {*/
+/*var id = this.get("id") + "_" + counter; counter++;*/
+/*html += "<option value='" + value + "'>" + options[value] + "</option>";*/
+/*}*/
+/*return html;*/
+/*}), */
+/*{*/
+/*"render_form_el_value": function(value) {*/
+/*$(this.get("el")).find("select").filter(function() {*/
+/*return $(this).val() == value ? true: false;*/
+/*});*/
+/*}*/
+/*}*/
+/*);*/
+
+/*$.fn.composerWidgets["picker"] = $.extend({}, */
+/*$.fn.composerWidgetsGenerator(function(el) {*/
+/*var html = "";*/
+/*html += "<div class='cInput'>";*/
+/*html += "<a href='#' class='cButton cPickerBack'>&#9664</a>";*/
+/*html += "<span class='cButton cPicker'></span>";*/
+/*html += "<a href='#' class='cButton cPickerNext'>&#9658</a>";*/
+/*html += "</div>";*/
+/*$(el).html(html);*/
+
+/*// Bind for value change*/
+/*var item = this;*/
+/*$(this.get("el")).find("a.cPickerBack").bind("click", function(e) {*/
+/*e.preventDefault();*/
+
+/*var new_index = Number(item.get("index")) - 1;*/
+/*if (new_index < 0) { return; }*/
+
+/*item.set({"index": new_index});*/
+/*});*/
+/*$(this.get("el")).find("a.cPickerNext").bind("click", function(e) {*/
+/*e.preventDefault();*/
+
+/*var new_index = Number(item.get("index")) + 1;*/
+/*if (new_index >= item.get("options").length) { return; }*/
+
+/*item.set({"index": new_index});*/
+/*});*/
+
+/*this.bind("change:options", function() {*/
+/*this.trigger("change:index");*/
+/*});*/
+
+/*this.bind("change:index", function() {*/
+/*var value = item.get("options")[ item.get("index") ];*/
+/*item.get("el").find(".cPicker").html( value );*/
+/*item.value( value );*/
+/*});*/
+/*if( !this.get("index") ) {*/
+/*this.set({"index": 0});*/
+/*}*/
+/*this.trigger("change:index");*/
+/*}),*/
+/*{*/
+/*"render_form_el_value": function(value) {*/
+/*var index = false;*/
+/*for (var index_check in this.get("options")) {*/
+/*if (value == this.get("options")[index_check]) {*/
+/*index = index_check;*/
+/*break;*/
+/*}*/
+/*}*/
+
+/*if( index ) {*/
+/*this.set({"index": index});*/
+/*}*/
+/*}	*/
+/*}*/
+/*);*/
+
+/*$.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], {*/
+/*"get_index": function(value) {*/
+/*for (var index in this.get("options")) {*/
+/*if (value == this.get("options")[index]) {*/
+/*return index;*/
+/*}*/
+/*}*/
+/*return false;*/
+/*},*/
+/*"initialize": function() {*/
+/*if( !this.get("options") ) {*/
+/*this.set({"options": []});*/
+/*}*/
+
+/*var html = "";*/
+/*if (this.get("label")) {*/
+/*html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";*/
+/*}*/
+
+/*html += "<div class='cInput'>";*/
+/*html += "<a href='#' class='cButton back'>Prev</a>";*/
+/*html += "<span class='cPicker'>" + this.get("options")[this.get("index")] + "</span>";*/
+/*html += "<a href='#' class='cButton next'>Next</a>";*/
+/*html += "</div>";*/
+
+/*$(this.get("el")).html(html);*/
+
+/*// Bind for value change*/
+/*var that = this;*/
+/*$(this.get("el")).find("a.back").bind("click", function(e) {*/
+/*e.preventDefault();*/
+/*var new_index = Number(that.get("index")) - 1;*/
+/*if (new_index < 0) { return; }*/
+/*that.set({"index": new_index});*/
+/*that.value(that.get("options")[that.get("index")]);*/
+/*});*/
+/*$(this.get("el")).find("a.next").bind("click", function(e) {*/
+/*e.preventDefault();*/
+/*var new_index = Number(that.get("index")) + 1;*/
+/*if (new_index >= that.get("options").length) { return; }*/
+/*that.set({"index": new_index});*/
+/*that.value(that.get("options")[that.get("index")]);*/
+/*});*/
+/*},*/
+/*"render_form_el_value": function(value) {*/
+/*$(this.get("el")).find("span").text(value);*/
+/*}*/
+/*});*/
+
+/*$.fn.composerWidgets["uploadify"] = $.extend({}, */
+/*$.fn.composerWidgetsGenerator(function(el) {*/
+/*//options*/
+/*var file_types = this.get("file_types") ? this.get("file_types") : "*";*/
+
+/*var html = "";*/
+/*if (this.get("label")) {*/
+/*// Show label if it's been specified*/
+/*html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";*/
+/*}*/
+
+/*html += "<div class='cInput'>";*/
+/*//loadingMsg must appear behind the input, so it is asbsolute; we need a position: relative object, and we can't use cInput because it is display:table-cell*/
+/*html += "<div style='position:relative'>"; */
+/*html += "<input id='" + this.get("id") + "' type='file_upload' />";*/
+/*html += "<div class='loadingMsg'>Loading</div>";*/
+/*html += "</div>";*/
+/*html += "</div>";*/
+
+/*$(this.get("el")).html(html);*/
+
+/*var uploadify_item = this;*/
+/*publisher.send({*/
+/*"module": "publisher", */
+/*"command": "get_uploadify_properties", */
+/*"args": {}, */
+/*"success": function(data, args) {*/
+/*args["scriptData"]["policy"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["policy"]));*/
+/*args["scriptData"]["signature"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["signature"]));*/
+
+/*var file_uploaded_fn = function(e, queueID, fileObj) {*/
+/*// Construct absolute URL of the image*/
+/*var loc = args["script"] + "/" + args["key"];*/
+/*// Replace the ${filename} placeholder with the real filename*/
+/*loc = loc.replace("${filename}", fileObj.name);*/
+
+/*//modify the progress bar to show that we are waiting for the FileObj to be created*/
+/*uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").html(" - attaching");*/
+
+/*// Create FileObj on server*/
+/*publisher.send({*/
+/*"module": "publisher",*/
+/*"command": "add_uploaded_file",*/
+/*"args": {*/
+/*"location": loc,*/
+/*"file_name": fileObj.name,*/
+/*"size": fileObj.size*/
+/*},*/
+/*"success": function(data, args) {*/
+/*uploadify_item.value([fileObj.name, args.key, loc] );*/
+/*uploadify_item.get("el").find(".cInput").append("<p>" + fileObj.name + "</p>");*/
+
+/*//remove the progress bar*/
+/*uploadify_item.get("el").find("#image_key" + queueID).addClass("uploadifyUploaded");*/
+/*}*/
+/*});*/
+/*};*/
+
+/*var uploadify_args = $.extend(args, {*/
+/*// Uploadify properties*/
+/*"uploader": site_data.settings.MEDIA_URL + "uploadify.swf",*/
+/*"buttonImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_upload.png",*/
+/*"cancelImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_cancel.png",*/
+/*"auto": true,*/
+/*"fileExt": file_types,*/
+/*"fileDesc": file_types,*/
+/*"buttonText": "Upload",*/
+/*"multi": false,*/
+/*"width": 71,*/
+/*"height": 20,*/
+/*"onSelectOnce": function(e, d) {*/
+/*// TODO*/
+/*},*/
+/*"onError": function(e, queueID, fileObj, errorObj) {*/
+/*if (errorObj.type === "File Size") {*/
+/*var remaining_mb = Math.round(errorObj.info / 10485.76) / 100;*/
+/*uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").after(" (" + remaining_mb + "MB remaining in course)");*/
+/*} else if (errorObj.info === 201) {*/
+/*// Flash for OS X treats 201 success messages as errors.*/
+/*file_uploaded_fn(e, queueID, fileObj);*/
+/*}*/
+/*},*/
+/*"onComplete": file_uploaded_fn*/
+/*});*/
+
+/*$(uploadify_item.get("el")).find("input#" + uploadify_item.get("id")).uploadify(uploadify_args);*/
+/*}*/
+/*});*/
+/*}),*/
+/*{*/
+/*"render_form_el_value": function(value) {} //uploadify cannot be set to existing value*/
+/*}*/
+/*);*/
+
+
+/*$.fn.composerWidgets["number"] = {};*/
+/*$.fn.composerWidgets["button"] = {};*/
+
+/*//FANCY WIDGETS*/
+/*$.fn.composerWidgets["fieldset"] = {*/
+/*"initialize": function() {*/
+/*this.get("el").html("<fieldset id='cId_" + this.get("id") + "'><legend>" + this.get("label") + "</legend><div class='cFieldsetData'></div></fieldset>");*/
+
+/*if( this.get("collapsible") ) {*/
+/*this.get("el").addClass("cCollapsible");*/
+
+/*//initialize collapsed property, if it has not been set*/
+/*if( this.get("collapsed") == undefined ) {*/
+/*this.set({"collapsed": false });*/
+/*}*/
+
+/*//bind function that hides or shows fieldset on collapsed property change*/
+/*this.bind("change:collapsed", function() {*/
+/*if( this.get("collapsed") === true ) {*/
+/*this.get("el").addClass("cCollapsed");*/
+/*} else {*/
+/*this.get("el").removeClass("cCollapsed");*/
+/*}*/
+/*});*/
+
+/*//trigger collapse handler in order to initialize with proper collapsed view*/
+/*this.trigger("change:collapsed");*/
+
+/*//update collapsed status, and re*/
+/*var item = this;*/
+/*this.get("el").find("legend").click(function(e){*/
+/*e.preventDefault();*/
+/*item.set({ "collapsed": !item.get("collapsed") });*/
+/*});*/
+/*}*/
+/*},*/
+/*"render_form_el_value": function(value) {*/
+/*var val = $.extend([], value);*/
+/*for( var index in val ) {*/
+/*val[index]["container_el"] = this.get("el").find(".cFieldsetData");*/
+/*}*/
+/*this.collection.add( value );*/
+/*}*/
+/*};*/
+
+/*$.fn.composerWidgets["hidden"] = {*/
+/*"initialize": function() {*/
+/*this.get("el").html("<input type='hidden' id='" + this.get("id") + "' value='" + this.value() + "'/>");*/
+/*}*/
+/*};*/
+
+/*$.fn.composerWidgets["html"] = 	{*/
+/*"initialize": function() {*/
+/*this.get("el").html( this.value() );*/
+/*}*/
+/*};*/
+
+/*$.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {*/
+/*"initialize": function() {*/
+/*$(this.get("el")).addClass("cClickInput");*/
+
+/*var html = '';*/
+/*html += "<div class='cInput'><input type='checkbox' id='" + this.get("id") + "'></div>";*/
+/*if( this.get("label") ) {*/
+/*html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";*/
+/*}*/
+/*$(this.get("el")).html(html);*/
+
+/*//bind for value change*/
+/*var that = this;*/
+/*$(this.get("el")).find("input").bind("click", function() {*/
+/*that.value( $(this).is(":checked") );*/
+/*});*/
+
+/*//explicitely set value to false if undefined*/
+/*if( this.value() == undefined ) {*/
+/*this.value(false);*/
+/*}*/
+
+/*//placeholder handler*/
+/*$.fn.composerWidgets["text"].set_placeholder.apply(this);*/
+/*$.fn.composerWidgets["text"].set_tooltip.apply(this);*/
+
+/*},*/
+/*"render_form_el_value": function( val ) {*/
+/*$(this.get("el")).find("input").attr("checked", val ? true : false);*/
+/*}*/
+/*});*/
+
+/*$.fn.composerWidgets["radio"] = $.fn.composerWidgetsGenerator(function(el) {*/
+
+/*var html = '';*/
+
+/*html += '<ul>';*/
+
+/*var options = this.get("options");*/
+/*var counter = 0;*/
+/*for( var value in options ) {*/
+/*var id = this.get("id") + "_" + counter; counter++;*/
+/*html += "<li>";*/
+/*html += "<div class='cRadioInput'><input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'></div>";*/
+/*html += "<div class='cRadioLabel'><label for='" + id + "'>" + options[value] + "</label></div>";*/
+/*html += "</li>";*/
+/*}*/
+/*html += "</ul>";*/
+
+/*$(el).html(html);*/
+
+/*//bind for value change*/
+/*var that = this;*/
+/*$(el).find("input").bind("click", function() {*/
+/*that.value( $(this).attr("value") );*/
+/*});*/
+
+/*//add inline class, if inline property specified*/
+/*if( this.get("inline") ) {*/
+/*$(el).addClass("cRadioInline");*/
+/*}*/
+/*},*/
+/*{*/
+/*"render_form_el_value": function( val ) {*/
+/*var matched_radio = $(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; });*/
+/*matched_radio.attr("checked", true);*/
+
+/*//mark as selected*/
+/*matched_radio.parents("li").siblings().removeClass("cRadioSelected");*/
+/*matched_radio.parents("li").addClass("cRadioSelected");*/
+/*}*/
+/*}*/
+/*);*/
+
+
+
+/* top docs */
 /*
 	COMPOSER WIDGETS
 
@@ -12,17 +547,17 @@
 
 	{
 		//renders the form element in the dom and binds any necessary events
-		//do not set the value of the element here - it will be done automatically (by calling 'set_value' after initialization)
+		//do not set the value of the element here - it will be done automatically (by calling 'render_form_el_value' after initialization)
 
 		//the intialize command should update the composerItem's value when the form element is changed (see example)
 		"initialize": function() {},
 
 		//updates the form element with the item's value (accessible via this.get("value"))
-		"set_value": function( val ) {},
+		"render_form_el_value": function( val ) {},
 
 		//takes a validation message and renders it on the screen; may take a string value or a false boolean, which should
 		//cause the validation message to be hidden
-		"set_validation_message": function(msg) {}
+		"render_validation_msg": function(msg) {}
 	}
 
 	Widget objects are called by composerItem instances, and calling the `this` variable inside of a function will return the
@@ -33,7 +568,7 @@
 		- this.get("el"); //the DOM element assigned to the widget
 		- this.get("label");
 		- this.value(); //get the value set in the composerItem instance
-		- this.value( val ); //set the composerItem instance's value (will call widget's 'set_value' function)
+		- this.value( val ); //set the composerItem instance's value (will call widget's 'render_form_el_value' function)
 
 	Validation functions are stored in the $.fn.composerWidgets dictionary. To add a new function, simply add another value
 	to the dictionary. The key will be used to identify the validation type.
@@ -52,10 +587,10 @@
 					item.value( $(this).val() );
 				});
 			},
-			"set_value": function( val ) {
+			"render_form_el_value": function( val ) {
 				$(this.get("el")).find("input").val( val );
 			},
-			"set_validation_message": function(msg) {
+			"render_validation_msg": function(msg) {
 				$(this.get("el")).find(".error").html(msg);
 			}
 		};
@@ -103,480 +638,4 @@
 		});
 */
 
-//GENERATOR FUNCTION - MAKES IT EASY TO BULID SIMPLE FORM ELEMENTS
-$.fn.composerWidgetsGenerator = function(input_html_generator_fn, extend_fn_dict) {
-	var widget = {
-		"initialize": function() {
-			$(this.get("el")).addClass("cTextInput");
-
-			var html = '';
-			if( this.get("label") ) {
-				html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-			}
-			html += "<div class='cInput'></div>";
-			$(this.get("el")).html(html);
-
-			input_html_generator_fn.apply(this, [$(this.get("el")).find(".cInput")]);
-
-			//bind for value change
-			var item = this;
-			$(this.get("el")).find("input").bind("change", function() {
-				item.value( $(this).val() );
-			});
-
-			//placeholder handler
-			this.get_widget().set_placeholder.apply(this);
-			this.get_widget().set_tooltip.apply(this);
-		},
-		"set_value": function( val ) {
-			$(this.get("el")).find("input").val( val );
-
-		},
-		"set_tooltip": function() {
-			if( this.get("tooltip") ) {
-				this.get("el").find(".cLabel:first").append("<div class='cTooltip'><span>" + this.get("tooltip") + "</span></div>");
-			}
-		},
-		"set_placeholder": function() {
-			if( !this.get("placeholder") ) { 
-				return false; 
-			}
-
-			//get the instances of 'input' and 'textarea' form elements
-			var form_els = $(this.get("el")).find("input").add( $(this.get("el")).find("textarea") );
-
-			//determine if the browser supports the native 'placeholder' property
-			var input = document.createElement("input");
-			var placeholder_support = 'placeholder' in input;
-
-			if( placeholder_support ) {
-				//easy, better approach
-				form_els.attr("placeholder", this.get("placeholder")); 
-			} else {
-				//otherwise, fake it
-				this.get("el").find(".cInput").append("<span class='cPlaceholder'>" + this.get("placeholder") + "</span>");
-
-				//hide the placeholder if there is a value
-				if( this.value() ) {
-					$(this.get("el")).find(".cPlaceholder").hide();
-				}
-
-				//re-run the set_placholder command on value change (e.g. a form element's value changed programmatically)
-				var item = this;
-				this.bind("change:value", function() {
-					item.get_widget().set_placeholder.apply(this);
-				});
-
-				//hide and show placeholder on click
-				form_els.add( $(this.get("el")).find(".cPlaceholder") ).click(function() {
-					$(item.get("el")).find(".cPlaceholder").hide();
-					form_els.focus();
-				});
-				form_els.bind("blur", function() {
-					$(this).siblings(".cPlaceholder").css("display", ( !$(this).val() ) ? "block" : "none");
-				});
-			}
-
-			return true;
-		},
-		"set_validation_message": function(msg) {
-			this.get("el").find(".cValidation").remove();
-			if( msg ) {
-				this.get("el").append("<div class='cValidation invalid'><span>" + msg + "</span></div>");
-			}
-		}
-	};
-
-    if( extend_fn_dict ) {
-        $.extend(widget, extend_fn_dict);
-    }
-    return widget;
-};
-
-
-//GENERIC WIDGETS
-$.fn.composerWidgets["text"] = $.fn.composerWidgetsGenerator(function(el) { 
-	$(el).html("<input type='text' id='" + this.get("id") + "'>");
-
-	if( this.get("number") && $.fn.numeric ) {
-		$(el).find("input").numeric({ allow: "-." });
-	}
-});
-
-$.fn.composerWidgets["password"] = $.fn.composerWidgetsGenerator(function(el) { 
-	$(el).html("<input type='password' id='" + this.get("id") + "'>");
-});
-
-$.fn.composerWidgets["textarea"] = $.fn.composerWidgetsGenerator(
-    function(el) {
-        $(el).html("<textarea id='" + this.get("id") + "'></textarea>");
-
-        var item = this;
-        $(this.get("el")).find("textarea").bind("change", function() {
-            item.value( $(this).val() );
-        });
-    },
-    {
-        "set_value": function( val ) {
-            $(this.get("el")).find("textarea").val( val );
-        }
-    }
-);
-
-$.fn.composerWidgets["select"] = $.extend(
-	{}, 
-	$.fn.composerWidgetsGenerator(function() {
-        var html = "<select id='" + this.get("id") + "'>";
-        var options = this.get("options");
-        
-        var counter = 0;
-        for (var value in options) {
-            var id = this.get("id") + "_" + counter; counter++;
-            html += "<option value='" + value + "'>" + options[value] + "</option>";
-        }
-		return html;
-	}), 
-	{
-		"set_value": function(value) {
-			$(this.get("el")).find("select").filter(function() {
-				return $(this).val() == value ? true: false;
-			});
-		}
-	}
-);
-
-$.fn.composerWidgets["picker"] = $.extend({}, 
-	$.fn.composerWidgetsGenerator(function(el) {
-		var html = "";
-		html += "<div class='cInput'>";
-        html += "<a href='#' class='cButton cPickerBack'>&#9664</a>";
-        html += "<span class='cButton cPicker'></span>";
-        html += "<a href='#' class='cButton cPickerNext'>&#9658</a>";
-        html += "</div>";
-		$(el).html(html);
-
-        // Bind for value change
-        var item = this;
-        $(this.get("el")).find("a.cPickerBack").bind("click", function(e) {
-            e.preventDefault();
-
-            var new_index = Number(item.get("index")) - 1;
-            if (new_index < 0) { return; }
-
-            item.set({"index": new_index});
-        });
-        $(this.get("el")).find("a.cPickerNext").bind("click", function(e) {
-            e.preventDefault();
-
-            var new_index = Number(item.get("index")) + 1;
-            if (new_index >= item.get("options").length) { return; }
-
-            item.set({"index": new_index});
-        });
-
-		this.bind("change:options", function() {
-			this.trigger("change:index");
-		});
-
-		this.bind("change:index", function() {
-			var value = item.get("options")[ item.get("index") ];
-			item.get("el").find(".cPicker").html( value );
-			item.value( value );
-		});
-		if( !this.get("index") ) {
-			this.set({"index": 0});
-		}
-		this.trigger("change:index");
-	}),
-	{
-		"set_value": function(value) {
-			var index = false;
-			for (var index_check in this.get("options")) {
-				if (value == this.get("options")[index_check]) {
-					index = index_check;
-					break;
-				}
-			}
-
-			if( index ) {
-				this.set({"index": index});
-			}
-		}	
-	}
-);
-
-$.fn.composerWidgets["old_picker"] = $.extend({}, $.fn.composerWidgets["text"], {
-	"get_index": function(value) {
-		for (var index in this.get("options")) {
-            if (value == this.get("options")[index]) {
-                return index;
-            }
-        }
-		return false;
-	},
-    "initialize": function() {
-		if( !this.get("options") ) {
-			this.set({"options": []});
-		}
-
-        var html = "";
-        if (this.get("label")) {
-            html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-        }
-
-        html += "<div class='cInput'>";
-        html += "<a href='#' class='cButton back'>Prev</a>";
-        html += "<span class='cPicker'>" + this.get("options")[this.get("index")] + "</span>";
-        html += "<a href='#' class='cButton next'>Next</a>";
-        html += "</div>";
-
-        $(this.get("el")).html(html);
-
-        // Bind for value change
-        var that = this;
-        $(this.get("el")).find("a.back").bind("click", function(e) {
-            e.preventDefault();
-            var new_index = Number(that.get("index")) - 1;
-            if (new_index < 0) { return; }
-            that.set({"index": new_index});
-            that.value(that.get("options")[that.get("index")]);
-        });
-        $(this.get("el")).find("a.next").bind("click", function(e) {
-            e.preventDefault();
-            var new_index = Number(that.get("index")) + 1;
-            if (new_index >= that.get("options").length) { return; }
-            that.set({"index": new_index});
-            that.value(that.get("options")[that.get("index")]);
-        });
-    },
-    "set_value": function(value) {
-        $(this.get("el")).find("span").text(value);
-    }
-});
-
-$.fn.composerWidgets["uploadify"] = $.extend({}, 
-    $.fn.composerWidgetsGenerator(function(el) {
-		//options
-		var file_types = this.get("file_types") ? this.get("file_types") : "*";
-
-        var html = "";
-        if (this.get("label")) {
-            // Show label if it's been specified
-            html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-        }
-
-        html += "<div class='cInput'>";
-		//loadingMsg must appear behind the input, so it is asbsolute; we need a position: relative object, and we can't use cInput because it is display:table-cell
-		html += "<div style='position:relative'>"; 
-        html += "<input id='" + this.get("id") + "' type='file_upload' />";
-		html += "<div class='loadingMsg'>Loading</div>";
-		html += "</div>";
-        html += "</div>";
-
-        $(this.get("el")).html(html);
-
-        var uploadify_item = this;
-        publisher.send({
-            "module": "publisher", 
-            "command": "get_uploadify_properties", 
-            "args": {}, 
-            "success": function(data, args) {
-                args["scriptData"]["policy"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["policy"]));
-                args["scriptData"]["signature"] = encodeURIComponent(encodeURIComponent(args["scriptData"]["signature"]));
-
-				var file_uploaded_fn = function(e, queueID, fileObj) {
-					// Construct absolute URL of the image
-					var loc = args["script"] + "/" + args["key"];
-					// Replace the ${filename} placeholder with the real filename
-					loc = loc.replace("${filename}", fileObj.name);
-
-					//modify the progress bar to show that we are waiting for the FileObj to be created
-					uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").html(" - attaching");
-					
-					// Create FileObj on server
-					publisher.send({
-						"module": "publisher",
-						"command": "add_uploaded_file",
-						"args": {
-							"location": loc,
-							"file_name": fileObj.name,
-							"size": fileObj.size
-						},
-						"success": function(data, args) {
-							uploadify_item.value([fileObj.name, args.key, loc] );
-							uploadify_item.get("el").find(".cInput").append("<p>" + fileObj.name + "</p>");
-
-							//remove the progress bar
-							uploadify_item.get("el").find("#image_key" + queueID).addClass("uploadifyUploaded");
-						}
-					});
-				};
-
-                var uploadify_args = $.extend(args, {
-                    // Uploadify properties
-                    "uploader": site_data.settings.MEDIA_URL + "uploadify.swf",
-                    "buttonImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_upload.png",
-                    "cancelImg": site_data.settings.MEDIA_URL + "images/edumacation/buttons/button_cancel.png",
-                    "auto": true,
-                    "fileExt": file_types,
-                    "fileDesc": file_types,
-                    "buttonText": "Upload",
-                    "multi": false,
-                    "width": 71,
-                    "height": 20,
-                    "onSelectOnce": function(e, d) {
-                        // TODO
-                    },
-                    "onError": function(e, queueID, fileObj, errorObj) {
-                        if (errorObj.type === "File Size") {
-							var remaining_mb = Math.round(errorObj.info / 10485.76) / 100;
-							uploadify_item.get("el").find("#image_key" + queueID).find("span.percentage").after(" (" + remaining_mb + "MB remaining in course)");
-                        } else if (errorObj.info === 201) {
-                            // Flash for OS X treats 201 success messages as errors.
-                            file_uploaded_fn(e, queueID, fileObj);
-                        }
-                    },
-                    "onComplete": file_uploaded_fn
-				});
-
-                $(uploadify_item.get("el")).find("input#" + uploadify_item.get("id")).uploadify(uploadify_args);
-            }
-        });
-    }),
-    {
-        "set_value": function(value) {} //uploadify cannot be set to existing value
-    }
-);
-
-
-$.fn.composerWidgets["number"] = {};
-$.fn.composerWidgets["button"] = {};
-
-//FANCY WIDGETS
-$.fn.composerWidgets["fieldset"] = {
-	"initialize": function() {
-		this.get("el").html("<fieldset id='cId_" + this.get("id") + "'><legend>" + this.get("label") + "</legend><div class='cFieldsetData'></div></fieldset>");
-
-		if( this.get("collapsible") ) {
-			this.get("el").addClass("cCollapsible");
-
-			//initialize collapsed property, if it has not been set
-			if( this.get("collapsed") == undefined ) {
-			   this.set({"collapsed": false });
-			}
-
-			//bind function that hides or shows fieldset on collapsed property change
-			this.bind("change:collapsed", function() {
-				if( this.get("collapsed") === true ) {
-					this.get("el").addClass("cCollapsed");
-				} else {
-					this.get("el").removeClass("cCollapsed");
-				}
-			});
-
-			//trigger collapse handler in order to initialize with proper collapsed view
-			this.trigger("change:collapsed");
-
-			//update collapsed status, and re
-			var item = this;
-			this.get("el").find("legend").click(function(e){
-				e.preventDefault();
-				item.set({ "collapsed": !item.get("collapsed") });
-			});
-		}
-	},
-    "set_value": function(value) {
-		var val = $.extend([], value);
-		for( var index in val ) {
-			val[index]["container_el"] = this.get("el").find(".cFieldsetData");
-		}
-		this.collection.add( value );
-    }
-};
-
-$.fn.composerWidgets["hidden"] = {
-	"initialize": function() {
-		this.get("el").html("<input type='hidden' id='" + this.get("id") + "' value='" + this.value() + "'/>");
-	}
-};
-
-$.fn.composerWidgets["html"] = 	{
-	"initialize": function() {
-		this.get("el").html( this.value() );
-	}
-};
-
-$.fn.composerWidgets["checkbox"] = $.extend({}, $.fn.composerWidgets["text"], {
-	"initialize": function() {
-		$(this.get("el")).addClass("cClickInput");
-
-		var html = '';
-		html += "<div class='cInput'><input type='checkbox' id='" + this.get("id") + "'></div>";
-		if( this.get("label") ) {
-			html += "<div class='cLabel'><label for='" + this.get("id") + "'>" + this.get("label") + "</label></div>";
-		}
-		$(this.get("el")).html(html);
-
-		//bind for value change
-		var that = this;
-		$(this.get("el")).find("input").bind("click", function() {
-			that.value( $(this).is(":checked") );
-		});
-
-		//explicitely set value to false if undefined
-		if( this.value() == undefined ) {
-			this.value(false);
-		}
-
-		//placeholder handler
-		$.fn.composerWidgets["text"].set_placeholder.apply(this);
-		$.fn.composerWidgets["text"].set_tooltip.apply(this);
-
-	},
-	"set_value": function( val ) {
-		$(this.get("el")).find("input").attr("checked", val ? true : false);
-	}
-});
-
-$.fn.composerWidgets["radio"] = $.fn.composerWidgetsGenerator(function(el) {
-
-		var html = '';
-
-		html += '<ul>';
-
-		var options = this.get("options");
-		var counter = 0;
-		for( var value in options ) {
-			var id = this.get("id") + "_" + counter; counter++;
-			html += "<li>";
-			html += "<div class='cRadioInput'><input type='radio' name='" + this.get("id") + "' id='" + id + "' value='" + value + "'></div>";
-			html += "<div class='cRadioLabel'><label for='" + id + "'>" + options[value] + "</label></div>";
-			html += "</li>";
-		}
-		html += "</ul>";
-		
-		$(el).html(html);
-	
-		//bind for value change
-		var that = this;
-		$(el).find("input").bind("click", function() {
-			that.value( $(this).attr("value") );
-		});
-
-		//add inline class, if inline property specified
-		if( this.get("inline") ) {
-			$(el).addClass("cRadioInline");
-		}
-	},
-	{
-		"set_value": function( val ) {
-			var matched_radio = $(this.get("el")).find("input").filter(function() { return $(this).attr("value") == val ? true : false; });
-            matched_radio.attr("checked", true);
-
-            //mark as selected
-            matched_radio.parents("li").siblings().removeClass("cRadioSelected");
-            matched_radio.parents("li").addClass("cRadioSelected");
-		}
-	}
-);
 

@@ -7,34 +7,19 @@ var composerItem = Backbone.Model.extend({
 			throw("Missing `id` or `type` properties!");
 		}
 
-		var el = $("<div></div>").addClass("cRow").addClass("cType_" + this.get("type")).attr("id", "cId_" + this.get("id"));
+        //initialize view
+        var item_view = this.get_widget();
+        this.set({ "view": new item_view({"model": this}) });
 
+        //add view to container
 		var container_el = this.get("container_el") ? this.get("container_el") : this.collection.el;
-		$(container_el).append(el);
+		$(container_el).append( this.get("view").el );
 
-		this.set({"el": el});
-
-		var that = this;
-		$(el).bind("click", function() {
-			that.trigger("click");
-		});
-
-		var widget = this.get_widget();
-		widget.initialize.apply(this);
 
 		//trigger validation on item value change
 		this.bind("change:value", function() {
-			var widget = this.get_widget();
-			if( widget.set_value ) {
-				widget.set_value.apply(this, [ this.get("value") ]);
-			}
-
 			var is_valid = this.is_valid();
 			this.trigger( is_valid ? "valid" : "invalid" );
-		});
-
-		this.bind("remove", function() {
-			this.get("el").remove();
 		});
 
 		//inform the collection of certain event changes
@@ -45,46 +30,17 @@ var composerItem = Backbone.Model.extend({
 			this.collection.trigger("invalid", this);
 		});
 
-		if( this.get("value") ) { this.trigger("change:value"); }
-
-		//set up event handlers for 'hidden' property
-		this.bind("change:hidden", function() {
-			if( this.get("hidden") === true ) {
-				this.get("el").hide();
-			} else {
-				this.get("el").show();
-			}
-		});
-		if( this.get("hidden") ) {
-			this.trigger("change:hidden");
-		}
-
         //run initialize function, if it is defined
         if( this.get("initialize") ) {
             this.get("initialize").apply(this);
         }
+
+        //run change function on value change, if defined
         this.bind("change:value", function() {
             if( this.get("change") ) {
                 this.get("change").apply(this);
             }
         });
-
-		this.bind("change:class", function() {
-			this.get("el").addClass( this.get("class") );
-		});
-		if( this.get("class") ) { 
-			this.trigger("change:class"); 
-		}
-
-        if( this.get("value") != undefined ) {
-			this.value( this.get("value") );
-		}
-	},
-	refresh: function() {
-		var widget = this.get_widget();
-		if( widget["refresh"] ) {
-			widget.refresh.apply(this);
-		}
 	},
 	hide: function(show_value_while_hidden) {
 		this.set({"hidden": true});
@@ -127,15 +83,7 @@ var composerItem = Backbone.Model.extend({
 			var result = validation.apply(this, [this.value()]);
 
 			//set validation message
-			if( this.get_widget().set_validation_message ) {
-				if( result !== true ) {
-					if( typeof result === "string" ) {
-						this.get_widget().set_validation_message.apply(this, [result]);
-					}
-				} else {
-					this.get_widget().set_validation_message.apply(this, [false]);
-				}
-			}
+            this.set({"validation_msg": result});
 
 			if( result !== true ) { 
 				return false;

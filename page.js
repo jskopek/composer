@@ -213,34 +213,41 @@ $(document).ready(function() {
 		"sortable": true
 	});
 
-	c = $("#form1 .form_container").composer();
-	c.add( dataset );
-	//c.get("username").hide();
-	c.bind("change", function() {
-		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
-	});
-	$("#form1 a").click(function(e) {
-		e.preventDefault();
-		$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );
+    c = $("#form1 .form_container").composer();
+    c.add([{
+        "id": "test",
+        "type": "text",
+        "value": "TESTING",
+        "number": true
+    }]);
 
-		console.log( c.values() );
-	});
-	//`c.get("username").set({"value": "blablabla"});
+    /*c.add( dataset );*/
+    /*//c.get("username").hide();*/
+    /*c.bind("change", function() {*/
+    /*$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );*/
+    /*});*/
+    /*$("#form1 a").click(function(e) {*/
+    /*e.preventDefault();*/
+    /*$("#status span").html( c.is_valid() ? "VALID :)" : "INVALID :(" );*/
 
-	var c2 = $("#form2 .form_container").composer();
-	c2.add( data2 );
+    /*console.log( c.values() );*/
+    /*});*/
+    /*//`c.get("username").set({"value": "blablabla"});*/
 
-	//events
-	c.bind("change", function(e) { 
-		console.log("form.change", e.value()); 
-	});
-	/*c.bind("add", function() { console.log("form.add"); });*/
-	/*c.bind("remove", function() { console.log("form.remove"); });*/
-	/*c.bind("valid", function() { console.log("form.valid"); });*/
-	/*c.bind("invalid", function() { console.log("form.invalid"); });*/
+    /*var c2 = $("#form2 .form_container").composer();*/
+    /*c2.add( data2 );*/
 
-	/*c.get("username").bind("change", function() { console.log("username.change"); });*/
-	/*c.get("username").bind("click", function() { console.log("username.click"); });*/
-	/*c.get("username").bind("valid", function() { console.log("username.valid"); });*/
-	/*c.get("username").bind("invalid", function() { console.log("username.invalid"); });*/
+    /*//events*/
+    /*c.bind("change", function(e) { */
+    /*console.log("form.change", e.value()); */
+    /*});*/
+    /**//*c.bind("add", function() { console.log("form.add"); });*/
+    /**//*c.bind("remove", function() { console.log("form.remove"); });*/
+    /**//*c.bind("valid", function() { console.log("form.valid"); });*/
+    /**//*c.bind("invalid", function() { console.log("form.invalid"); });*/
+
+    /**//*c.get("username").bind("change", function() { console.log("username.change"); });*/
+    /**//*c.get("username").bind("click", function() { console.log("username.click"); });*/
+    /**//*c.get("username").bind("valid", function() { console.log("username.valid"); });*/
+    /**//**//*c.get("username").bind("invalid", function() { console.log("username.invalid"); });*/
 });
